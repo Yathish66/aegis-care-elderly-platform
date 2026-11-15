@@ -15,7 +15,9 @@ import {
   ZoomOut,
   Lock,
   Eye,
-  UserCog
+  UserCog,
+  Box,
+  FileText
 } from 'lucide-react';
 import { SupportedLanguage, TRANSLATIONS } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -32,6 +34,8 @@ interface NavbarProps {
   onOpenSecurityArchitecture?: () => void;
   onOpenAccessibility?: () => void;
   onOpenProfileSetup?: () => void;
+  onOpenVirtualMedibox?: () => void;
+  onOpenMedicalPassport?: () => void;
   language?: SupportedLanguage;
   onSelectLanguage?: (lang: SupportedLanguage) => void;
 }
@@ -48,6 +52,8 @@ export function Navbar({
   onOpenSecurityArchitecture,
   onOpenAccessibility,
   onOpenProfileSetup,
+  onOpenVirtualMedibox,
+  onOpenMedicalPassport,
   language = 'en',
   onSelectLanguage,
 }: NavbarProps) {
@@ -143,6 +149,26 @@ export function Navbar({
                   {unreadEmailCount}
                 </span>
               )}
+            </button>
+
+            {/* Virtual Medibox (Star Synthesis 1) */}
+            <button
+              onClick={onOpenVirtualMedibox}
+              title="Virtual Medibox 7-Day Dispenser (Synthesized from Smart-Medibox & Dosezy)"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 text-xs font-bold transition-all"
+            >
+              <Box className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Medibox</span>
+            </button>
+
+            {/* Clinical ER Passport (Star Synthesis 2) */}
+            <button
+              onClick={onOpenMedicalPassport}
+              title="Printable Emergency Clinical Passport (Synthesized from NextPills & GeriLife)"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-bold transition-all"
+            >
+              <FileText className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Passport</span>
             </button>
 
             {/* Patient & Family Healthcare Profile Setup */}

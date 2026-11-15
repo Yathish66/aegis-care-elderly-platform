@@ -21,6 +21,8 @@ import { AuditTrailDrawer } from '@/components/AuditTrailDrawer';
 import { SecurityArchitectureModal } from '@/components/SecurityArchitectureModal';
 import { AccessibilitySettingsModal } from '@/components/AccessibilitySettingsModal';
 import { PatientProfileModal } from '@/components/PatientProfileModal';
+import { VirtualMediboxModal } from '@/components/VirtualMediboxModal';
+import { EmergencyMedicalPassportModal } from '@/components/EmergencyMedicalPassportModal';
 import { playAccessibleChime } from '@/lib/accessibility';
 import { SupportedLanguage } from '@/lib/i18n';
 import { 
@@ -75,6 +77,8 @@ export default function Home() {
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isA11yModalOpen, setIsA11yModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isVirtualMediboxOpen, setIsVirtualMediboxOpen] = useState(false);
+  const [isMedicalPassportOpen, setIsMedicalPassportOpen] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [speechSpeed, setSpeechSpeed] = useState(0.9);
   const [language, setLanguage] = useState<SupportedLanguage>('en');
@@ -580,6 +584,8 @@ export default function Home() {
         onOpenSecurityArchitecture={() => setIsSecurityModalOpen(true)}
         onOpenAccessibility={() => setIsA11yModalOpen(true)}
         onOpenProfileSetup={() => setIsProfileModalOpen(true)}
+        onOpenVirtualMedibox={() => setIsVirtualMediboxOpen(true)}
+        onOpenMedicalPassport={() => setIsMedicalPassportOpen(true)}
         language={language}
         onSelectLanguage={handleSelectLanguage}
       />
@@ -604,6 +610,8 @@ export default function Home() {
             onOpenVoiceAssistant={() => setIsVoiceAssistantOpen(true)}
             onOpenPillIdentifier={() => setIsPillIdentifierOpen(true)}
             onOpenEmergencyModal={() => setIsEmergencyModalOpen(true)}
+            onOpenVirtualMedibox={() => setIsVirtualMediboxOpen(true)}
+            onOpenMedicalPassport={() => setIsMedicalPassportOpen(true)}
             language={language}
           />
         ) : (
@@ -754,6 +762,21 @@ export default function Home() {
         currentProfile={profile}
         onSaveProfile={handleSaveProfile}
         onResetToDefault={handleResetProfile}
+      />
+
+      <VirtualMediboxModal
+        isOpen={isVirtualMediboxOpen}
+        onClose={() => setIsVirtualMediboxOpen(false)}
+        medications={medications}
+        onTakeDose={handleMarkDoseTaken}
+        profile={profile}
+      />
+
+      <EmergencyMedicalPassportModal
+        isOpen={isMedicalPassportOpen}
+        onClose={() => setIsMedicalPassportOpen(false)}
+        profile={profile}
+        medications={medications}
       />
 
     </div>

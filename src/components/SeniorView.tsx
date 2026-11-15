@@ -20,7 +20,9 @@ import {
   Mic,
   Camera,
   Siren,
-  HelpCircle
+  HelpCircle,
+  Box,
+  FileText
 } from 'lucide-react';
 import { Medication, ElderlyProfile } from '@/types';
 import { SupportedLanguage, TRANSLATIONS, SUPPORTED_LANGUAGES } from '@/lib/i18n';
@@ -36,6 +38,8 @@ interface SeniorViewProps {
   onOpenVoiceAssistant?: () => void;
   onOpenPillIdentifier?: () => void;
   onOpenEmergencyModal?: () => void;
+  onOpenVirtualMedibox?: () => void;
+  onOpenMedicalPassport?: () => void;
   language?: SupportedLanguage;
 }
 
@@ -49,6 +53,8 @@ export function SeniorView({
   onOpenVoiceAssistant,
   onOpenPillIdentifier,
   onOpenEmergencyModal,
+  onOpenVirtualMedibox,
+  onOpenMedicalPassport,
   language = 'en',
 }: SeniorViewProps) {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'bedtime'>('all');
@@ -264,6 +270,65 @@ export function SeniorView({
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
               {t.emergencyIdDesc}
             </p>
+          </div>
+        </button>
+      </div>
+
+      {/* Star-Synthesis Innovations: Virtual Medibox & ER Clinical Passport */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Virtual Medibox Dispenser (Synthesized from Smart-Medibox & Dosezy) */}
+        <button
+          onClick={onOpenVirtualMedibox}
+          className="p-5 rounded-3xl bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/20 border-2 border-indigo-500/30 hover:border-indigo-500 hover:shadow-lg transition-all text-left flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-4 rounded-2xl bg-indigo-600 text-white shadow-md group-hover:scale-105 transition-transform shrink-0">
+              <Box className="h-7 w-7 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                  Star Synthesis #1
+                </span>
+                <span className="rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-black px-2 py-0.5">
+                  IoT Dispenser
+                </span>
+              </div>
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Virtual Medibox™ 7-Day Dispenser
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                4-slot physical compartment simulator with active LED alerts & 1-tap dispense.
+              </p>
+            </div>
+          </div>
+        </button>
+
+        {/* Printable ER Medical Passport (Synthesized from NextPills & GeriLife) */}
+        <button
+          onClick={onOpenMedicalPassport}
+          className="p-5 rounded-3xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 border-2 border-amber-500/30 hover:border-amber-500 hover:shadow-lg transition-all text-left flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-4 rounded-2xl bg-amber-600 text-white shadow-md group-hover:scale-105 transition-transform shrink-0">
+              <FileText className="h-7 w-7" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  Star Synthesis #2
+                </span>
+                <span className="rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black px-2 py-0.5">
+                  Printable ER Card
+                </span>
+              </div>
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                Clinical ER Medical Passport
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                1-Click printable paramedic wallet card with FDA NDC codes, blood type & doctor contacts.
+              </p>
+            </div>
           </div>
         </button>
       </div>
