@@ -25,6 +25,7 @@ interface NavbarProps {
   seniorFontSize: 'normal' | 'large' | 'extra-large';
   onToggleFontSize: () => void;
   onEmergencyCall: () => void;
+  onOpenSecurityArchitecture?: () => void;
 }
 
 export function Navbar({
@@ -36,6 +37,7 @@ export function Navbar({
   seniorFontSize,
   onToggleFontSize,
   onEmergencyCall,
+  onOpenSecurityArchitecture,
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-md transition-colors">
@@ -120,6 +122,16 @@ export function Navbar({
                   {unreadEmailCount}
                 </span>
               )}
+            </button>
+
+            {/* Security Architecture & HIPAA Whitepaper */}
+            <button
+              onClick={onOpenSecurityArchitecture}
+              title="Security, Data Storage & HIPAA Architecture"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Security & Data</span>
             </button>
 
             {/* IIT Kharagpur Jury Tour Mode */}

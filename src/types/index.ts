@@ -18,6 +18,9 @@ export interface Medication {
   refillThreshold?: number;
   rxNumber?: string;
   pharmacyName?: string;
+  ndcCode?: string;
+  rxNormId?: string;
+  manufacturer?: string;
 }
 
 export interface DoctorAppointment {

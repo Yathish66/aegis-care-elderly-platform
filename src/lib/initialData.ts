@@ -43,6 +43,9 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     refillThreshold: 10,
     rxNumber: 'RX-99214-MET',
     pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
+    ndcCode: '0093-1048-01',
+    rxNormId: '860975',
+    manufacturer: 'Teva Pharmaceuticals USA',
   },
   {
     id: 'med-2',
@@ -61,6 +64,9 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     refillThreshold: 7,
     rxNumber: 'RX-67120-TEL',
     pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
+    ndcCode: '0597-0040-30',
+    rxNormId: '316353',
+    manufacturer: 'Boehringer Ingelheim Pharmaceuticals',
   },
   {
     id: 'med-3',
@@ -79,6 +85,9 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     refillThreshold: 7,
     rxNumber: 'RX-88412-GLI',
     pharmacyName: 'MedPlus Health Services - Outer Ring Rd',
+    ndcCode: '0093-0131-01',
+    rxNormId: '197737',
+    manufacturer: 'Teva Pharmaceuticals USA',
   },
   {
     id: 'med-4',
@@ -97,6 +106,9 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     refillThreshold: 5,
     rxNumber: 'RX-77291-ATO',
     pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
+    ndcCode: '0071-0155-23',
+    rxNormId: '259255',
+    manufacturer: 'Pfizer Laboratories',
   },
 ];
 

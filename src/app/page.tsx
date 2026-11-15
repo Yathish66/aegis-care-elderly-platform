@@ -18,6 +18,7 @@ import { PharmacyRefillModal } from '@/components/PharmacyRefillModal';
 import { EmergencyMedicalIDModal } from '@/components/EmergencyMedicalIDModal';
 import { PillIdentifierModal } from '@/components/PillIdentifierModal';
 import { AuditTrailDrawer } from '@/components/AuditTrailDrawer';
+import { SecurityArchitectureModal } from '@/components/SecurityArchitectureModal';
 import { 
   INITIAL_PROFILE, 
   INITIAL_MEDICATIONS, 
@@ -67,6 +68,7 @@ export default function Home() {
   const [isPharmacyRefillOpen, setIsPharmacyRefillOpen] = useState(false);
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -437,6 +439,7 @@ export default function Home() {
         seniorFontSize={seniorFontSize}
         onToggleFontSize={toggleSeniorFontSize}
         onEmergencyCall={() => setIsEmergencyModalOpen(true)}
+        onOpenSecurityArchitecture={() => setIsSecurityModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -486,6 +489,16 @@ export default function Home() {
         onClose={() => setIsPasscodeModalOpen(false)}
         targetPersona={pendingPersona}
         onSuccess={handlePasscodeSuccess}
+        onLockout={() => {
+          addAuditLog(
+            'Security Watchdog',
+            'SYSTEM',
+            'Brute-Force Passcode Lockout',
+            'SECURITY',
+            'Keypad locked for 30 seconds due to 5 consecutive failed PIN attempts.'
+          );
+          showToast('🔒 Keypad locked for 30s (Brute-force rate limiting active)');
+        }}
       />
 
       <PrescriptionScannerModal
@@ -562,6 +575,11 @@ export default function Home() {
         isOpen={isAuditTrailOpen}
         onClose={() => setIsAuditTrailOpen(false)}
         logs={auditLogs}
+      />
+
+      <SecurityArchitectureModal
+        isOpen={isSecurityModalOpen}
+        onClose={() => setIsSecurityModalOpen(false)}
       />
 
     </div>
