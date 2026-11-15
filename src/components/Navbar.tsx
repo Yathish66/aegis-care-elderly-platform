@@ -14,7 +14,8 @@ import {
   ZoomIn, 
   ZoomOut,
   Lock,
-  Eye
+  Eye,
+  UserCog
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -28,6 +29,7 @@ interface NavbarProps {
   onEmergencyCall: () => void;
   onOpenSecurityArchitecture?: () => void;
   onOpenAccessibility?: () => void;
+  onOpenProfileSetup?: () => void;
 }
 
 export function Navbar({
@@ -41,6 +43,7 @@ export function Navbar({
   onEmergencyCall,
   onOpenSecurityArchitecture,
   onOpenAccessibility,
+  onOpenProfileSetup,
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-md transition-colors">
@@ -125,6 +128,16 @@ export function Navbar({
                   {unreadEmailCount}
                 </span>
               )}
+            </button>
+
+            {/* Patient & Family Healthcare Profile Setup */}
+            <button
+              onClick={onOpenProfileSetup}
+              title="Personalize Patient Profile (Real Family Member Onboarding)"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 border border-teal-500/30 text-xs font-bold transition-all"
+            >
+              <UserCog className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <span className="hidden sm:inline">Profile Setup</span>
             </button>
 
             {/* Accessibility & Sensory Hub (WCAG AAA) */}

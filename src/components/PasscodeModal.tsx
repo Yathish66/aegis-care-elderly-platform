@@ -10,6 +10,8 @@ interface PasscodeModalProps {
   targetPersona: 'senior' | 'family';
   onSuccess: (persona: 'senior' | 'family') => void;
   onLockout?: () => void;
+  seniorPasscode?: string;
+  familyPasscode?: string;
 }
 
 export function PasscodeModal({
@@ -18,6 +20,8 @@ export function PasscodeModal({
   targetPersona,
   onSuccess,
   onLockout,
+  seniorPasscode = '1234',
+  familyPasscode = '5678',
 }: PasscodeModalProps) {
   const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
@@ -37,7 +41,7 @@ export function PasscodeModal({
 
   if (!isOpen) return null;
 
-  const correctPin = targetPersona === 'senior' ? '1234' : '5678';
+  const correctPin = targetPersona === 'senior' ? (seniorPasscode || '1234') : (familyPasscode || '5678');
   const isLockedOut = lockoutTime > 0;
 
   const handleDigit = (digit: string) => {

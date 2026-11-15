@@ -20,6 +20,7 @@ import { PillIdentifierModal } from '@/components/PillIdentifierModal';
 import { AuditTrailDrawer } from '@/components/AuditTrailDrawer';
 import { SecurityArchitectureModal } from '@/components/SecurityArchitectureModal';
 import { AccessibilitySettingsModal } from '@/components/AccessibilitySettingsModal';
+import { PatientProfileModal } from '@/components/PatientProfileModal';
 import { playAccessibleChime } from '@/lib/accessibility';
 import { 
   INITIAL_PROFILE, 
@@ -33,7 +34,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_REFILLS
 } from '@/lib/initialData';
-import { Medication, DoctorAppointment, EmailNotification, SafetyAlert, VitalReading, AuditLogEntry, PharmacyRefillOrder } from '@/types';
+import { Medication, DoctorAppointment, EmailNotification, SafetyAlert, VitalReading, AuditLogEntry, PharmacyRefillOrder, ElderlyProfile } from '@/types';
 import { ExtractedMedication } from '@/lib/gemini';
 import confetti from 'canvas-confetti';
 
@@ -72,8 +73,33 @@ export default function Home() {
   const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isA11yModalOpen, setIsA11yModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [speechSpeed, setSpeechSpeed] = useState(0.9);
+
+  // Restore persisted profile and medications on client mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedProfile = localStorage.getItem('aegis_patient_profile');
+        if (savedProfile) {
+          const parsed = JSON.parse(savedProfile);
+          if (parsed && parsed.fullName) {
+            setProfile(parsed);
+          }
+        }
+        const savedMeds = localStorage.getItem('aegis_medications');
+        if (savedMeds) {
+          const parsed = JSON.parse(savedMeds);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMedications(parsed);
+          }
+        }
+      } catch (err) {
+        console.error('LocalStorage restoration error:', err);
+      }
+    }
+  }, []);
 
   // Global Keyboard Navigation (WCAG 2.1 AAA Accessibility)
   React.useEffect(() => {
@@ -141,6 +167,47 @@ export default function Home() {
       `Passcode verification succeeded for ${target}.`
     );
     showToast(`Switched to ${target === 'senior' ? 'Senior Mode' : 'Family & Caregiver Portal'}`);
+  };
+
+  // Patient Profile Personalization & Onboarding
+  const handleSaveProfile = (updatedProfile: ElderlyProfile) => {
+    setProfile(updatedProfile);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('aegis_patient_profile', JSON.stringify(updatedProfile));
+      } catch (err) {
+        console.error('LocalStorage profile save error:', err);
+      }
+    }
+    playAccessibleChime('success');
+    addAuditLog(
+      'Family Caregiver',
+      'CAREGIVER',
+      'Personalized Patient Profile',
+      'SECURITY',
+      `Profile updated for ${updatedProfile.fullName} (${updatedProfile.age}y). Senior PIN: ${updatedProfile.seniorPasscode}, Caregiver PIN: ${updatedProfile.familyPasscode}.`
+    );
+    showToast(`✓ Profile updated for ${updatedProfile.fullName}! All reminders & emergency IDs updated.`);
+  };
+
+  const handleResetProfile = () => {
+    setProfile(INITIAL_PROFILE);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('aegis_patient_profile');
+      } catch (err) {
+        console.error('LocalStorage profile reset error:', err);
+      }
+    }
+    playAccessibleChime('success');
+    addAuditLog(
+      'System Admin',
+      'SYSTEM',
+      'Reset Profile to Default Demo',
+      'SECURITY',
+      'Patient profile restored to default demo baseline (Dadi Kamala).'
+    );
+    showToast('✓ Profile reset to default demo standard.');
   };
 
   // Dose Actions
@@ -479,6 +546,7 @@ export default function Home() {
         onEmergencyCall={() => setIsEmergencyModalOpen(true)}
         onOpenSecurityArchitecture={() => setIsSecurityModalOpen(true)}
         onOpenAccessibility={() => setIsA11yModalOpen(true)}
+        onOpenProfileSetup={() => setIsProfileModalOpen(true)}
       />
 
       {/* Main Content Area (WCAG 2.1 AAA Landmark & Skip Target) */}
@@ -523,6 +591,7 @@ export default function Home() {
             onToggleDoseStatus={handleToggleDoseStatus}
             onRunGeminiSafetyCheck={handleRunGeminiSafetyCheck}
             isAnalyzingSafety={isAnalyzingSafety}
+            onOpenProfileSetup={() => setIsProfileModalOpen(true)}
           />
         )}
 
@@ -533,6 +602,8 @@ export default function Home() {
         isOpen={isPasscodeModalOpen}
         onClose={() => setIsPasscodeModalOpen(false)}
         targetPersona={pendingPersona}
+        seniorPasscode={profile.seniorPasscode}
+        familyPasscode={profile.familyPasscode}
         onSuccess={handlePasscodeSuccess}
         onLockout={() => {
           addAuditLog(
@@ -636,6 +707,14 @@ export default function Home() {
         onToggleHighContrast={() => setIsHighContrast((prev) => !prev)}
         speechSpeed={speechSpeed}
         onSetSpeechSpeed={setSpeechSpeed}
+      />
+
+      <PatientProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        currentProfile={profile}
+        onSaveProfile={handleSaveProfile}
+        onResetToDefault={handleResetProfile}
       />
 
     </div>

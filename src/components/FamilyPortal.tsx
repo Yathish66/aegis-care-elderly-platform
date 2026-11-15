@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Activity,
   ShoppingBag,
-  ShieldCheck
+  ShieldCheck,
+  UserCog
 } from 'lucide-react';
 import { Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, ElderlyProfile, VitalReading } from '@/types';
 import { VitalsTracker } from '@/components/VitalsTracker';
@@ -48,6 +49,7 @@ interface FamilyPortalProps {
   onToggleDoseStatus: (id: string) => void;
   onRunGeminiSafetyCheck: () => void;
   isAnalyzingSafety: boolean;
+  onOpenProfileSetup?: () => void;
 }
 
 export function FamilyPortal({
@@ -70,6 +72,7 @@ export function FamilyPortal({
   onToggleDoseStatus,
   onRunGeminiSafetyCheck,
   isAnalyzingSafety,
+  onOpenProfileSetup,
 }: FamilyPortalProps) {
   const [activeTab, setActiveTab] = useState<'analytics' | 'schedule' | 'vitals' | 'pharmacy' | 'appointments' | 'escalation'>('analytics');
 
@@ -98,6 +101,14 @@ export function FamilyPortal({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={onOpenProfileSetup}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-700/30 transition-all active:scale-95"
+            >
+              <UserCog className="w-4 h-4" />
+              <span>Personalize Profile</span>
+            </button>
+
             <button
               onClick={onOpenPharmacyRefill}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-700/30 transition-all active:scale-95"
