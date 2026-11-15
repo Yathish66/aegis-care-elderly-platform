@@ -12,7 +12,6 @@ import {
   Clock, 
   Volume2, 
   Sparkles, 
-  AlertCircle,
   ShieldCheck
 } from 'lucide-react';
 import { Medication, ElderlyProfile } from '@/types';

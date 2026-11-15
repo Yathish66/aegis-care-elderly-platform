@@ -10,10 +10,7 @@ import {
   Server, 
   X, 
   FileCheck, 
-  EyeOff, 
-  CheckCircle2, 
-  Layers,
-  HardDrive
+  Layers
 } from 'lucide-react';
 
 interface SecurityArchitectureModalProps {

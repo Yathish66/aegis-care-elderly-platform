@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Medication, ElderlyProfile } from '@/types';
-import { Mic, MicOff, Volume2, Sparkles, X, HeartHandshake, Check, AlertCircle } from 'lucide-react';
+import { Mic, Volume2, Sparkles, X, HeartHandshake } from 'lucide-react';
 
 interface VoiceAssistantModalProps {
   isOpen: boolean;
@@ -18,7 +18,6 @@ export function VoiceAssistantModal({
   onClose,
   medications,
   profile,
-  onMarkDoseTaken,
 }: VoiceAssistantModalProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');

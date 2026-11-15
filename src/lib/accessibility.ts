@@ -46,7 +46,7 @@ export function playAccessibleChime(type: 'success' | 'alert' | 'listening') {
       osc.start();
       osc.stop(ctx.currentTime + 0.2);
     }
-  } catch (err) {
+  } catch {
     // Gracefully ignore audio if browser policy restricts auto-audio
   }
 }

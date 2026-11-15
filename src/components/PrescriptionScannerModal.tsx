@@ -5,15 +5,11 @@ import {
   X, 
   Camera, 
   Sparkles, 
-  FileText, 
   CheckCircle2, 
   Loader2, 
   Plus, 
-  AlertCircle,
-  Pill,
-  Clock
+  Pill
 } from 'lucide-react';
-import { Medication } from '@/types';
 import { ExtractedMedication } from '@/lib/gemini';
 
 interface PrescriptionScannerModalProps {
@@ -124,7 +120,7 @@ export function PrescriptionScannerModal({
         } else {
           setExtractedMeds(SAMPLE_PRESCRIPTIONS[0].sampleData);
         }
-      } catch (err) {
+      } catch {
         setExtractedMeds(SAMPLE_PRESCRIPTIONS[0].sampleData);
       } finally {
         setIsProcessing(false);

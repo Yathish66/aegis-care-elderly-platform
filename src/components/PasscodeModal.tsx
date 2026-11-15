@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Lock, KeyRound, ShieldCheck, User, Users, AlertOctagon, ShieldAlert } from 'lucide-react';
+import { X, Lock, User, Users, ShieldAlert } from 'lucide-react';
 
 interface PasscodeModalProps {
   isOpen: boolean;

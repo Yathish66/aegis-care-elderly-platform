@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Medication, PillRecognitionResult } from '@/types';
-import { Camera, Sparkles, CheckCircle2, AlertOctagon, X, Search, ShieldCheck } from 'lucide-react';
+import { Camera, Sparkles, CheckCircle2, AlertOctagon, X } from 'lucide-react';
 
 interface PillIdentifierModalProps {
   isOpen: boolean;

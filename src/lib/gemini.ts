@@ -7,7 +7,7 @@ let ai: GoogleGenAI | null = null;
 if (apiKey) {
   try {
     ai = new GoogleGenAI({ apiKey });
-  } catch (err) {
+  } catch {
     console.warn('Could not initialize Google GenAI SDK with key, running in resilient fallback mode');
   }
 }
@@ -453,7 +453,7 @@ function getFallbackPrescriptionData(): ExtractedMedication[] {
   ];
 }
 
-function getFallbackSafetyData(medications: string[]): SafetyCheckResult {
+function getFallbackSafetyData(_medications: string[]): SafetyCheckResult {
   return {
     overallRisk: 'MODERATE_CAUTION',
     interactions: [
@@ -480,7 +480,7 @@ function getFallbackSafetyData(medications: string[]): SafetyCheckResult {
   };
 }
 
-function getFallbackCorrelationData(vitals: VitalReading[], medications: Medication[]): VitalCorrelationAnalysis {
+function getFallbackCorrelationData(_vitals: VitalReading[], _medications: Medication[]): VitalCorrelationAnalysis {
   return {
     summary: 'Strong positive therapeutic response. Morning blood pressure normalized to 118/76 mmHg post-Telmisartan dose, and fasting glucose remained stable at 124 mg/dL.',
     clinicalObservations: [

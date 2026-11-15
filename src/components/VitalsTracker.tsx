@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { VitalReading, Medication, ElderlyProfile, VitalCorrelationAnalysis } from '@/types';
-import { Activity, Heart, Droplets, Wind, Sparkles, AlertTriangle, CheckCircle, TrendingUp, Plus, RefreshCw } from 'lucide-react';
+import { Activity, Heart, Droplets, Wind, Sparkles, AlertTriangle, CheckCircle, TrendingUp, Plus } from 'lucide-react';
 
 interface VitalsTrackerProps {
   vitals: VitalReading[];

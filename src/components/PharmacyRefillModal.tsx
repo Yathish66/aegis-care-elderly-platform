@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Medication, ElderlyProfile, PharmacyRefillOrder } from '@/types';
-import { Pill, ShoppingBag, Truck, CheckCircle, AlertTriangle, Send, X, FileText, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Truck, CheckCircle, AlertTriangle, Send, X, FileText } from 'lucide-react';
 
 interface PharmacyRefillModalProps {
   isOpen: boolean;
