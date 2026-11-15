@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/ecosystem.test.mjs test/unit/pharmacology.test.mjs test/api/gemini-endpoints.test.mjs test/security/auth-protection.test.mjs test/accessibility/wcag.test.mjs",
     "test:unit": "node --test test/unit/pharmacology.test.mjs",

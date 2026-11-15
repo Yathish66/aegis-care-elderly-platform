@@ -16,7 +16,9 @@ import {
   Activity,
   ShoppingBag,
   Siren,
-  Mic
+  Mic,
+  Box,
+  FileText
 } from 'lucide-react';
 
 interface JudgeWalkthroughModalProps {
@@ -261,6 +263,40 @@ export function JudgeWalkthroughModal({
                   <p className="text-[11px] text-muted-foreground">Parse cardiology prescription handwriting into structured doses</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-teal-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('medibox');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-indigo-500/10 hover:border-indigo-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Box className="h-4 w-4 text-indigo-600" />
+                    <span>Scenario 7: Virtual Medibox™ 7-Day Dispenser</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Synthesized from Smart-Medibox with active LED alerts & 1-click take</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-indigo-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('passport');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-amber-500/10 hover:border-amber-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-amber-600" />
+                    <span>Scenario 8: Clinical ER Medical Passport & Wallet Card</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Printable paramedic wallet card with FDA NDC codes & allergies</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-600" />
               </button>
             </div>
           </div>

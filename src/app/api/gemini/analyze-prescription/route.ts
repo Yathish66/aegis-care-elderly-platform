@@ -23,10 +23,11 @@ export async function POST(req: Request) {
         timestamp: new Date().toISOString(),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Prescription OCR Route Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to analyze prescription';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to analyze prescription' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }

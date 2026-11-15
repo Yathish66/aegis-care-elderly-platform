@@ -111,6 +111,11 @@ export default function Home() {
     }
   }, []);
 
+  const showToast = React.useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  }, []);
+
   // Global Keyboard Navigation (WCAG 2.1 AAA Accessibility)
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -140,12 +145,7 @@ export default function Home() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
-  };
+  }, [showToast]);
 
   const addAuditLog = (actor: string, role: AuditLogEntry['role'], action: string, category: AuditLogEntry['category'], details: string) => {
     const entry: AuditLogEntry = {
@@ -553,6 +553,10 @@ export default function Home() {
     } else if (scenario === 'escalation') {
       setCurrentPersona('family');
       handleTriggerMissedDoseEscalation();
+    } else if (scenario === 'medibox') {
+      setIsVirtualMediboxOpen(true);
+    } else if (scenario === 'passport') {
+      setIsMedicalPassportOpen(true);
     }
   };
 

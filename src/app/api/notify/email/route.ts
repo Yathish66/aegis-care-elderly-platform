@@ -30,9 +30,10 @@ export async function POST(req: Request) {
       message: `Proactive email alert dispatched to ${recipientEmail}`,
       delivery: deliveryPayload,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to dispatch email';
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to dispatch email' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }
