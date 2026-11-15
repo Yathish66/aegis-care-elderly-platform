@@ -9,6 +9,7 @@
 [![Languages](https://img.shields.io/badge/Languages-5_Regional_Supported-blue?style=for-the-badge)](./)
 [![Security Policy](https://img.shields.io/badge/Security-SECURITY.md-emerald?style=for-the-badge)](./SECURITY.md)
 [![Privacy Charter](https://img.shields.io/badge/Privacy-PRIVACY.md-teal?style=for-the-badge)](./PRIVACY.md)
+[![Architecture](https://img.shields.io/badge/Architecture-ARCHITECTURE.md-indigo?style=for-the-badge)](./ARCHITECTURE.md)
 [![RFC 9116](https://img.shields.io/badge/RFC_9116-security.txt-success?style=for-the-badge)](./public/.well-known/security.txt)
 [![Tests: Passing](https://img.shields.io/badge/Tests-40_Passing_(14_Suites)-brightgreen?style=for-the-badge)](./)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
