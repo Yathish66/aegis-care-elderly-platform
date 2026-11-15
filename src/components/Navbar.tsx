@@ -13,7 +13,8 @@ import {
   Moon, 
   ZoomIn, 
   ZoomOut,
-  Lock
+  Lock,
+  Eye
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,6 +27,7 @@ interface NavbarProps {
   onToggleFontSize: () => void;
   onEmergencyCall: () => void;
   onOpenSecurityArchitecture?: () => void;
+  onOpenAccessibility?: () => void;
 }
 
 export function Navbar({
@@ -38,6 +40,7 @@ export function Navbar({
   onToggleFontSize,
   onEmergencyCall,
   onOpenSecurityArchitecture,
+  onOpenAccessibility,
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-md transition-colors">
@@ -122,6 +125,16 @@ export function Navbar({
                   {unreadEmailCount}
                 </span>
               )}
+            </button>
+
+            {/* Accessibility & Sensory Hub (WCAG AAA) */}
+            <button
+              onClick={onOpenAccessibility}
+              title="Accessibility & Inclusive Sensory Controls (WCAG 2.1 AAA)"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all"
+            >
+              <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden sm:inline">A11y Hub</span>
             </button>
 
             {/* Security Architecture & HIPAA Whitepaper */}

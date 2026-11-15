@@ -19,6 +19,8 @@ import { EmergencyMedicalIDModal } from '@/components/EmergencyMedicalIDModal';
 import { PillIdentifierModal } from '@/components/PillIdentifierModal';
 import { AuditTrailDrawer } from '@/components/AuditTrailDrawer';
 import { SecurityArchitectureModal } from '@/components/SecurityArchitectureModal';
+import { AccessibilitySettingsModal } from '@/components/AccessibilitySettingsModal';
+import { playAccessibleChime } from '@/lib/accessibility';
 import { 
   INITIAL_PROFILE, 
   INITIAL_MEDICATIONS, 
@@ -69,6 +71,40 @@ export default function Home() {
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [isA11yModalOpen, setIsA11yModalOpen] = useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(false);
+  const [speechSpeed, setSpeechSpeed] = useState(0.9);
+
+  // Global Keyboard Navigation (WCAG 2.1 AAA Accessibility)
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && !e.ctrlKey && !e.metaKey) {
+        if (e.key === 's' || e.key === 'S') {
+          e.preventDefault();
+          setCurrentPersona('senior');
+          showToast('Keyboard Shortcut: Senior Mode');
+          playAccessibleChime('listening');
+        } else if (e.key === 'f' || e.key === 'F') {
+          e.preventDefault();
+          setPendingPersona('family');
+          setIsPasscodeModalOpen(true);
+        } else if (e.key === 'v' || e.key === 'V') {
+          e.preventDefault();
+          setIsVoiceAssistantOpen(true);
+          playAccessibleChime('listening');
+        } else if (e.key === 'e' || e.key === 'E') {
+          e.preventDefault();
+          setIsEmergencyModalOpen(true);
+          playAccessibleChime('alert');
+        } else if (e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          setIsA11yModalOpen(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -161,6 +197,7 @@ export default function Home() {
     };
 
     setEmails((prev) => [newEmail, ...prev]);
+    playAccessibleChime('success');
     showToast(`✓ Great job Dadi! Logged ${med.name} as taken. Notification sent to daughter Priya.`);
   };
 
@@ -318,6 +355,7 @@ export default function Home() {
 
   // Trigger Emergency SOS
   const handleTriggerEmergencySOS = () => {
+    playAccessibleChime('alert');
     addAuditLog(
       'Dadi Kamala (Senior)',
       'SENIOR',
@@ -440,10 +478,17 @@ export default function Home() {
         onToggleFontSize={toggleSeniorFontSize}
         onEmergencyCall={() => setIsEmergencyModalOpen(true)}
         onOpenSecurityArchitecture={() => setIsSecurityModalOpen(true)}
+        onOpenAccessibility={() => setIsA11yModalOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      {/* Main Content Area (WCAG 2.1 AAA Landmark & Skip Target) */}
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 outline-none ${
+          isHighContrast ? 'contrast-125 saturate-125' : ''
+        }`}
+      >
         
         {currentPersona === 'senior' ? (
           <SeniorView
@@ -580,6 +625,17 @@ export default function Home() {
       <SecurityArchitectureModal
         isOpen={isSecurityModalOpen}
         onClose={() => setIsSecurityModalOpen(false)}
+      />
+
+      <AccessibilitySettingsModal
+        isOpen={isA11yModalOpen}
+        onClose={() => setIsA11yModalOpen(false)}
+        fontSize={seniorFontSize}
+        onSetFontSize={setSeniorFontSize}
+        isHighContrast={isHighContrast}
+        onToggleHighContrast={() => setIsHighContrast((prev) => !prev)}
+        speechSpeed={speechSpeed}
+        onSetSpeechSpeed={setSpeechSpeed}
       />
 
     </div>
