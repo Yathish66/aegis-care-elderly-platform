@@ -9,7 +9,8 @@
 [![Languages](https://img.shields.io/badge/Languages-5_Regional_Supported-blue?style=for-the-badge)](./)
 [![Security Policy](https://img.shields.io/badge/Security-SECURITY.md-emerald?style=for-the-badge)](./SECURITY.md)
 [![Privacy Charter](https://img.shields.io/badge/Privacy-PRIVACY.md-teal?style=for-the-badge)](./PRIVACY.md)
-[![Tests: Passing](https://img.shields.io/badge/Tests-35_Passing_(13_Suites)-brightgreen?style=for-the-badge)](./)
+[![RFC 9116](https://img.shields.io/badge/RFC_9116-security.txt-success?style=for-the-badge)](./public/.well-known/security.txt)
+[![Tests: Passing](https://img.shields.io/badge/Tests-40_Passing_(14_Suites)-brightgreen?style=for-the-badge)](./)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
 
 > Built for **PromptWars × Catalyst Solo Hackathon 2026** — Powered by **Google for Developers**, **Hack2Skill**, and **Makers Need More (MnM)**.
@@ -244,7 +245,7 @@ flowchart TD
 AegisCare incorporates a comprehensive test matrix designed to satisfy strict hackathon automated evaluation:
 
 ```bash
-# Run entire test suite (35 tests across 13 suites)
+# Run entire test suite (40 tests across 14 suites)
 pnpm test
 
 # Run modular domain tests

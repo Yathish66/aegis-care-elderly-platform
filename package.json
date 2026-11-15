@@ -8,12 +8,12 @@
     "start": "next start",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/ecosystem.test.mjs test/unit/pharmacology.test.mjs test/api/gemini-endpoints.test.mjs test/security/auth-protection.test.mjs test/accessibility/wcag.test.mjs",
-    "test:unit": "node --test test/unit/pharmacology.test.mjs",
+    "test": "node --test test/ecosystem.test.mjs test/unit/pharmacology.test.mjs test/unit/error-resilience.test.mjs test/api/gemini-endpoints.test.mjs test/security/auth-protection.test.mjs test/accessibility/wcag.test.mjs",
+    "test:unit": "node --test test/unit/pharmacology.test.mjs test/unit/error-resilience.test.mjs",
     "test:api": "node --test test/api/gemini-endpoints.test.mjs",
     "test:security": "node --test test/security/auth-protection.test.mjs",
     "test:a11y": "node --test test/accessibility/wcag.test.mjs",
-    "test:all": "node --test test/ecosystem.test.mjs test/unit/pharmacology.test.mjs test/api/gemini-endpoints.test.mjs test/security/auth-protection.test.mjs test/accessibility/wcag.test.mjs"
+    "test:all": "node --test test/ecosystem.test.mjs test/unit/pharmacology.test.mjs test/unit/error-resilience.test.mjs test/api/gemini-endpoints.test.mjs test/security/auth-protection.test.mjs test/accessibility/wcag.test.mjs"
   },
   "dependencies": {
     "@google/genai": "^3.3.0",

@@ -1,0 +1,7 @@
+Contact: mailto:security@aegiscare-health.org
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en, hi
+Canonical: https://aegis-care-elderly-platform.vercel.app/.well-known/security.txt
+Policy: https://github.com/Yathish66/aegis-care-elderly-platform/blob/main/SECURITY.md
+Acknowledgments: https://github.com/Yathish66/aegis-care-elderly-platform
+Hiring: https://github.com/Yathish66/aegis-care-elderly-platform
