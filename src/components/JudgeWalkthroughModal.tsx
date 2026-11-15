@@ -1,3 +1,4 @@
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -12,7 +13,10 @@ import {
   Volume2, 
   Users,
   ChevronRight,
-  ExternalLink
+  Activity,
+  ShoppingBag,
+  Siren,
+  Mic
 } from 'lucide-react';
 
 interface JudgeWalkthroughModalProps {
@@ -31,7 +35,7 @@ export function JudgeWalkthroughModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in">
       <div className="w-full max-w-2xl bg-card border border-border rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
         
         {/* Header */}
@@ -89,8 +93,8 @@ export function JudgeWalkthroughModal({
                 <strong>Our Solution (AegisCare AI):</strong> A unified ecosystem with <strong>Passcode-based access control</strong> connecting elderly individuals with their family and caregivers in real time.
               </p>
               <ul className="list-disc pl-5 space-y-1 text-foreground">
-                <li>Senior View: Zero-confusion, large text, audio voice readouts, 1-tap dose logging.</li>
-                <li>Family Portal: Live adherence telemetry, remote schedule management, proactive escalation alerts.</li>
+                <li>Senior View: Zero-confusion, large text, voice readouts, 1-tap dose logging, conversational companion.</li>
+                <li>Family Portal: Live biometric telemetry, remote pharmacy refills, prescription vision OCR, and proactive escalation.</li>
               </ul>
             </div>
           </div>
@@ -105,14 +109,14 @@ export function JudgeWalkthroughModal({
                 <span className="font-black text-emerald-700 dark:text-emerald-300 text-sm flex items-center gap-1.5">
                   👵 Senior Mode (PIN: 1234)
                 </span>
-                <p className="text-muted-foreground">High-contrast, distraction-free interface with text-to-speech audio readout and 1-tap dose confirmation.</p>
+                <p className="text-muted-foreground">High-contrast, distraction-free interface with text-to-speech audio readout, voice companion, and 1-tap dose confirmation.</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-teal-500/10 border border-teal-500/20 space-y-2 text-xs">
                 <span className="font-black text-teal-700 dark:text-teal-300 text-sm flex items-center gap-1.5">
                   👨‍👩‍👧 Family Portal (PIN: 5678)
                 </span>
-                <p className="text-muted-foreground">Full adherence graphs, prescription camera OCR, doctor appointments, and proactive email notification triggers.</p>
+                <p className="text-muted-foreground">Full adherence graphs, prescription camera OCR, vitals telemetry correlation, pharmacy inventory, and HIPAA audit trail.</p>
               </div>
             </div>
           </div>
@@ -126,24 +130,24 @@ export function JudgeWalkthroughModal({
               <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-3">
                 <Camera className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-foreground">1. Multimodal Prescription OCR</h4>
-                  <p className="text-muted-foreground">Gemini reads doctor handwriting and Latin clinical sig codes (OD, BD, PC) to extract structured dosage schedules with zero manual typing.</p>
+                  <h4 className="font-bold text-foreground">1. Multimodal Prescription & Pill Vision</h4>
+                  <p className="text-muted-foreground">Reads handwritten clinical orders (OD, BD, PC) and verifies unknown loose pills by shape, color, and imprints.</p>
                 </div>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-3">
-                <ShieldCheck className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <Activity className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-foreground">2. Clinical Drug-Drug & Food Interaction Guardian</h4>
-                  <p className="text-muted-foreground">Continuously analyzes multi-drug stacks for adverse interactions (e.g., Atorvastatin + Grapefruit risk) and dietary contraindications.</p>
+                  <h4 className="font-bold text-foreground">2. Biometric Vitals & Drug Efficacy Correlation</h4>
+                  <p className="text-muted-foreground">Correlates Blood Pressure & Glucose trends with dosage timestamps to surface clinical efficacy reports.</p>
                 </div>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-3">
-                <Mail className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
+                <Mic className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-foreground">3. Proactive Email Escalation Engine</h4>
-                  <p className="text-muted-foreground">Autonomous notification dispatcher alerts daughters and caregivers if doses remain untaken 60 minutes after schedule.</p>
+                  <h4 className="font-bold text-foreground">3. Natural Voice Companion</h4>
+                  <p className="text-muted-foreground">Conversational speech assistant for elders answering questions like &ldquo;Did I take my morning pill?&rdquo; with voice synthesis.</p>
                 </div>
               </div>
             </div>
@@ -156,19 +160,90 @@ export function JudgeWalkthroughModal({
             <h3 className="text-lg font-black text-foreground">1-Click Live Test Scenarios</h3>
             <p className="text-xs text-muted-foreground">Click any scenario below to immediately experience the platform in action:</p>
 
-            <div className="space-y-2.5">
+            <div className="grid gap-2 text-xs">
               <button
                 onClick={() => {
-                  onSelectScenario('senior');
+                  onSelectScenario('voice');
                   onClose();
                 }}
-                className="w-full p-4 rounded-2xl border border-border bg-muted/40 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-left transition-all flex items-center justify-between"
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-left transition-all flex items-center justify-between"
               >
                 <div>
-                  <div className="text-xs font-black text-foreground">Scenario A: Test Senior Mode with Voice Readout</div>
-                  <p className="text-[11px] text-muted-foreground">Listen to audio readout & tap "I TOOK THIS" for Dadi Kamala</p>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Mic className="h-4 w-4 text-emerald-600" />
+                    <span>Scenario 1: Aegis Conversational Voice Companion</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Test speech-to-text question answering & audio readout for Dadi Kamala</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-emerald-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('pill-id');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-blue-500/10 hover:border-blue-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Camera className="h-4 w-4 text-blue-600" />
+                    <span>Scenario 2: AI Computer Vision Pill Identifier</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Scan and recognize loose tablets (e.g. Metformin M-500 vs unknown)</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-blue-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('vitals');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-indigo-500/10 hover:border-indigo-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-indigo-600" />
+                    <span>Scenario 3: Vitals Telemetry & Gemini Clinical Correlation</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Inspect BP & glucose logs and trigger AI biometric trend analysis</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-indigo-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('emergency');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-rose-500/10 hover:border-rose-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Siren className="h-4 w-4 text-rose-600" />
+                    <span>Scenario 4: Paramedic Emergency Medical ID & SOS Beacon</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Test unblocked lockscreen medical card, blood type, and GPS beacon</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-rose-600" />
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectScenario('pharmacy');
+                  onClose();
+                }}
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-amber-500/10 hover:border-amber-500/40 text-left transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <ShoppingBag className="h-4 w-4 text-amber-600" />
+                    <span>Scenario 5: Pharmacy Low-Stock Doorstep Refill</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Inspect Telmisartan low pill alert (3 doses left) and dispatch refill order</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-600" />
               </button>
 
               <button
@@ -176,27 +251,16 @@ export function JudgeWalkthroughModal({
                   onSelectScenario('ocr');
                   onClose();
                 }}
-                className="w-full p-4 rounded-2xl border border-border bg-muted/40 hover:bg-teal-500/10 hover:border-teal-500/40 text-left transition-all flex items-center justify-between"
+                className="w-full p-3.5 rounded-2xl border border-border bg-muted/40 hover:bg-teal-500/10 hover:border-teal-500/40 text-left transition-all flex items-center justify-between"
               >
                 <div>
-                  <div className="text-xs font-black text-foreground">Scenario B: Test Gemini Prescription Vision OCR</div>
-                  <p className="text-[11px] text-muted-foreground">Simulate parsing Dr. Ramesh Patel's handwritten cardiology prescription</p>
+                  <div className="font-black text-foreground flex items-center gap-1.5">
+                    <Camera className="h-4 w-4 text-teal-600" />
+                    <span>Scenario 6: Gemini Prescription Vision OCR</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Parse cardiology prescription handwriting into structured doses</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-teal-600" />
-              </button>
-
-              <button
-                onClick={() => {
-                  onSelectScenario('escalation');
-                  onClose();
-                }}
-                className="w-full p-4 rounded-2xl border border-border bg-muted/40 hover:bg-rose-500/10 hover:border-rose-500/40 text-left transition-all flex items-center justify-between"
-              >
-                <div>
-                  <div className="text-xs font-black text-foreground">Scenario C: Test Proactive Missed Dose Escalation Email</div>
-                  <p className="text-[11px] text-muted-foreground">Trigger automated alert to daughter Priya and inspect email log</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-rose-600" />
               </button>
             </div>
           </div>

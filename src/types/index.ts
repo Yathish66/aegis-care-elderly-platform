@@ -13,6 +13,11 @@ export interface Medication {
   status: DoseStatus;
   lastTakenAt?: string;
   foodWarning?: string; // "Avoid grapefruit juice"
+  remainingPills?: number;
+  totalPills?: number;
+  refillThreshold?: number;
+  rxNumber?: string;
+  pharmacyName?: string;
 }
 
 export interface DoctorAppointment {
@@ -58,7 +63,7 @@ export interface EmailNotification {
   id: string;
   recipientEmail: string;
   recipientName: string;
-  type: 'UPCOMING_DOSE' | 'MISSED_DOSE_ESCALATION' | 'APPOINTMENT_REMINDER' | 'DAILY_REPORT';
+  type: 'UPCOMING_DOSE' | 'MISSED_DOSE_ESCALATION' | 'APPOINTMENT_REMINDER' | 'DAILY_REPORT' | 'EMERGENCY_SOS' | 'PHARMACY_REFILL';
   subject: string;
   body: string;
   timestamp: string;
@@ -80,4 +85,67 @@ export interface ElderlyProfile {
     phone: string;
     relation: string;
   };
+  physician: {
+    name: string;
+    clinic: string;
+    phone: string;
+  };
+  livingWillStatus: string;
+  homeAddress: string;
+}
+
+export interface VitalReading {
+  id: string;
+  timestamp: string;
+  dateStr: string;
+  bloodPressureSys: number;
+  bloodPressureDia: number;
+  bloodGlucose: number; // mg/dL
+  heartRate: number; // bpm
+  oxygenSaturation: number; // %
+  notes?: string;
+  flag: 'NORMAL' | 'ELEVATED' | 'CRITICAL';
+}
+
+export interface VitalCorrelationAnalysis {
+  summary: string;
+  clinicalObservations: string[];
+  adherenceImpact: string;
+  recommendations: string[];
+  confidenceScore: number;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  actor: string;
+  role: 'SENIOR' | 'CAREGIVER' | 'SYSTEM' | 'PHYSICIAN';
+  action: string;
+  category: 'MEDICATION' | 'SECURITY' | 'APPOINTMENT' | 'SAFETY' | 'EMERGENCY' | 'TELEMETRY';
+  details: string;
+}
+
+export interface PharmacyRefillOrder {
+  id: string;
+  medicationId: string;
+  medicationName: string;
+  rxNumber: string;
+  quantityOrdered: number;
+  orderedAt: string;
+  status: 'DISPATCHED' | 'IN_TRANSIT' | 'DELIVERED';
+  pharmacyName: string;
+  deliveryAddress: string;
+}
+
+export interface PillRecognitionResult {
+  identified: boolean;
+  matchName?: string;
+  dosage?: string;
+  colorDescription?: string;
+  shapeDescription?: string;
+  imprintDetected?: string;
+  confidenceScore: number;
+  clinicalAdvice: string;
+  matchesPrescription: boolean;
+  scheduledTime?: string;
 }

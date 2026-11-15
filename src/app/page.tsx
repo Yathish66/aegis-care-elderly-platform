@@ -1,3 +1,4 @@
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -11,6 +12,12 @@ import { JudgeWalkthroughModal } from '@/components/JudgeWalkthroughModal';
 import { EmailCenterDrawer } from '@/components/EmailCenterDrawer';
 import { AddMedicationModal } from '@/components/AddMedicationModal';
 import { AddAppointmentModal } from '@/components/AddAppointmentModal';
+import { VitalsTracker } from '@/components/VitalsTracker';
+import { VoiceAssistantModal } from '@/components/VoiceAssistantModal';
+import { PharmacyRefillModal } from '@/components/PharmacyRefillModal';
+import { EmergencyMedicalIDModal } from '@/components/EmergencyMedicalIDModal';
+import { PillIdentifierModal } from '@/components/PillIdentifierModal';
+import { AuditTrailDrawer } from '@/components/AuditTrailDrawer';
 import { 
   INITIAL_PROFILE, 
   INITIAL_MEDICATIONS, 
@@ -18,9 +25,12 @@ import {
   INITIAL_CAREGIVERS, 
   INITIAL_ADHERENCE_HISTORY, 
   INITIAL_SAFETY_ALERTS, 
-  INITIAL_EMAILS 
+  INITIAL_EMAILS,
+  INITIAL_VITALS,
+  INITIAL_AUDIT_LOGS,
+  INITIAL_REFILLS
 } from '@/lib/initialData';
-import { Medication, DoctorAppointment, EmailNotification, SafetyAlert } from '@/types';
+import { Medication, DoctorAppointment, EmailNotification, SafetyAlert, VitalReading, AuditLogEntry, PharmacyRefillOrder } from '@/types';
 import { ExtractedMedication } from '@/lib/gemini';
 import confetti from 'canvas-confetti';
 
@@ -33,6 +43,9 @@ export default function Home() {
   const [adherenceHistory, setAdherenceHistory] = useState(INITIAL_ADHERENCE_HISTORY);
   const [safetyAlerts, setSafetyAlerts] = useState<SafetyAlert[]>(INITIAL_SAFETY_ALERTS);
   const [emails, setEmails] = useState<EmailNotification[]>(INITIAL_EMAILS);
+  const [vitals, setVitals] = useState<VitalReading[]>(INITIAL_VITALS);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOGS);
+  const [refills, setRefills] = useState<PharmacyRefillOrder[]>(INITIAL_REFILLS);
 
   // Persona & UI State
   const [currentPersona, setCurrentPersona] = useState<'senior' | 'family'>('senior');
@@ -49,10 +62,28 @@ export default function Home() {
   const [isEmailDrawerOpen, setIsEmailDrawerOpen] = useState(false);
   const [isAddMedOpen, setIsAddMedOpen] = useState(false);
   const [isAddAptOpen, setIsAddAptOpen] = useState(false);
+  const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState(false);
+  const [isPillIdentifierOpen, setIsPillIdentifierOpen] = useState(false);
+  const [isPharmacyRefillOpen, setIsPharmacyRefillOpen] = useState(false);
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+  const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const addAuditLog = (actor: string, role: AuditLogEntry['role'], action: string, category: AuditLogEntry['category'], details: string) => {
+    const entry: AuditLogEntry = {
+      id: `audit-${Date.now()}`,
+      timestamp: `Today at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`,
+      actor,
+      role,
+      action,
+      category,
+      details,
+    };
+    setAuditLogs((prev) => [entry, ...prev]);
   };
 
   // Persona Switch Handler with Passcode Trigger
@@ -64,27 +95,40 @@ export default function Home() {
 
   const handlePasscodeSuccess = (target: 'senior' | 'family') => {
     setCurrentPersona(target);
+    addAuditLog(
+      target === 'senior' ? 'Dadi Kamala (Senior)' : 'Priya Sharma (Daughter)',
+      target === 'senior' ? 'SENIOR' : 'CAREGIVER',
+      `Authenticated: ${target === 'senior' ? 'Senior Mode' : 'Family Portal'}`,
+      'SECURITY',
+      `Passcode verification succeeded for ${target}.`
+    );
     showToast(`Switched to ${target === 'senior' ? 'Senior Mode' : 'Family & Caregiver Portal'}`);
   };
 
   // Dose Actions
   const handleMarkDoseTaken = async (medId: string) => {
-    const med = medications.find(m => m.id === medId);
+    const med = medications.find((m) => m.id === medId);
     if (!med) return;
 
-    setMedications(prev => prev.map(m => {
-      if (m.id === medId) {
-        return {
-          ...m,
-          status: 'taken',
-          lastTakenAt: `Today at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`,
-        };
-      }
-      return m;
-    }));
+    const timeStr = `Today at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+
+    setMedications((prev) =>
+      prev.map((m) => {
+        if (m.id === medId) {
+          const remaining = m.remainingPills !== undefined ? Math.max(0, m.remainingPills - 1) : 14;
+          return {
+            ...m,
+            status: 'taken',
+            lastTakenAt: timeStr,
+            remainingPills: remaining,
+          };
+        }
+        return m;
+      })
+    );
 
     // Update Adherence History
-    setAdherenceHistory(prev => {
+    setAdherenceHistory((prev) => {
       const copy = [...prev];
       const today = copy[copy.length - 1];
       if (today) {
@@ -94,6 +138,14 @@ export default function Home() {
       return copy;
     });
 
+    addAuditLog(
+      'Dadi Kamala (Senior)',
+      'SENIOR',
+      `Dose Confirmed Taken: ${med.name}`,
+      'MEDICATION',
+      `Marked ${med.name} (${med.dosage}) taken. Inventory updated.`
+    );
+
     // Proactive Notification to Daughter
     const newEmail: EmailNotification = {
       id: `mail-${Date.now()}`,
@@ -102,31 +154,49 @@ export default function Home() {
       type: 'UPCOMING_DOSE',
       subject: `Dose Logged: Dadi Kamala took ${med.name} (${med.dosage})`,
       body: `Dadi Kamala just confirmed taking her ${med.name} (${med.dosage}) scheduled for ${med.scheduledTime}. Adherence telemetry updated.`,
-      timestamp: `Today at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`,
+      timestamp: timeStr,
       status: 'DELIVERED',
     };
 
-    setEmails(prev => [newEmail, ...prev]);
+    setEmails((prev) => [newEmail, ...prev]);
     showToast(`✓ Great job Dadi! Logged ${med.name} as taken. Notification sent to daughter Priya.`);
   };
 
   const handleSnoozeDose = (medId: string) => {
+    const med = medications.find((m) => m.id === medId);
+    addAuditLog(
+      'Dadi Kamala (Senior)',
+      'SENIOR',
+      `Dose Snoozed: ${med?.name || medId}`,
+      'MEDICATION',
+      'Gentle alarm rescheduled for +15 minutes.'
+    );
     showToast('⏰ Dose snoozed for 15 minutes. We will remind you gently.');
   };
 
   const handleToggleDoseStatus = (medId: string) => {
-    setMedications(prev => prev.map(m => {
-      if (m.id === medId) {
-        const nextStatus = m.status === 'taken' ? 'upcoming' : 'taken';
-        return { ...m, status: nextStatus };
-      }
-      return m;
-    }));
+    setMedications((prev) =>
+      prev.map((m) => {
+        if (m.id === medId) {
+          const nextStatus = m.status === 'taken' ? 'upcoming' : 'taken';
+          return { ...m, status: nextStatus };
+        }
+        return m;
+      })
+    );
     showToast('Updated medication status');
   };
 
   const handleDeleteMedication = (id: string) => {
-    setMedications(prev => prev.filter(m => m.id !== id));
+    const med = medications.find((m) => m.id === id);
+    setMedications((prev) => prev.filter((m) => m.id !== id));
+    addAuditLog(
+      'Priya Sharma (Daughter)',
+      'CAREGIVER',
+      `Medication Removed: ${med?.name || id}`,
+      'MEDICATION',
+      'Regimen removed from active schedule.'
+    );
     showToast('Medication removed from active schedule');
   };
 
@@ -144,23 +214,116 @@ export default function Home() {
       pillColor: 'border-teal-500 bg-teal-500/10 text-teal-600',
       status: 'upcoming',
       foodWarning: em.foodWarning,
+      remainingPills: 30,
+      totalPills: 30,
+      refillThreshold: 7,
+      rxNumber: `RX-${Math.floor(10000 + Math.random() * 90000)}`,
+      pharmacyName: 'Apollo Pharmacy #104',
     }));
 
-    setMedications(prev => [...prev, ...formatted]);
+    setMedications((prev) => [...prev, ...formatted]);
+    addAuditLog(
+      'Priya Sharma (Caregiver)',
+      'CAREGIVER',
+      `Prescription OCR Import: ${formatted.length} Meds`,
+      'MEDICATION',
+      `Imported: ${formatted.map((f) => f.name).join(', ')} via Gemini Vision.`
+    );
     showToast(`✓ Added ${formatted.length} new medications extracted by Gemini Vision!`);
     confetti({ particleCount: 50, spread: 60 });
   };
 
   // Add Medication
   const handleAddSingleMedication = (newMed: Medication) => {
-    setMedications(prev => [...prev, newMed]);
+    setMedications((prev) => [...prev, newMed]);
+    addAuditLog(
+      'Priya Sharma (Daughter)',
+      'CAREGIVER',
+      `New Medication Added: ${newMed.name}`,
+      'MEDICATION',
+      `Scheduled ${newMed.name} (${newMed.dosage}) for ${newMed.scheduledTime}.`
+    );
     showToast(`Added ${newMed.name} to active schedule`);
   };
 
   // Add Appointment
   const handleAddAppointment = (newApt: DoctorAppointment) => {
-    setAppointments(prev => [...prev, newApt]);
+    setAppointments((prev) => [...prev, newApt]);
+    addAuditLog(
+      'Priya Sharma (Daughter)',
+      'CAREGIVER',
+      `Appointment Scheduled: ${newApt.doctorName}`,
+      'APPOINTMENT',
+      `Visit confirmed for ${newApt.date} at ${newApt.time} (${newApt.clinic}).`
+    );
     showToast(`Scheduled visit with ${newApt.doctorName}`);
+  };
+
+  // Add Vital Reading
+  const handleAddVital = (newVital: VitalReading) => {
+    setVitals((prev) => [newVital, ...prev]);
+    addAuditLog(
+      'Priya Sharma (Caregiver)',
+      'CAREGIVER',
+      `Biometric Reading Logged: BP ${newVital.bloodPressureSys}/${newVital.bloodPressureDia}`,
+      'TELEMETRY',
+      `Glucose: ${newVital.bloodGlucose} mg/dL, HR: ${newVital.heartRate} bpm. Status: ${newVital.flag}.`
+    );
+    showToast('✓ Vitals recorded and correlated with medication schedule');
+  };
+
+  // Pharmacy Refill Complete
+  const handleRefillComplete = (medId: string, quantity: number) => {
+    const med = medications.find((m) => m.id === medId);
+    if (!med) return;
+
+    setMedications((prev) =>
+      prev.map((m) => {
+        if (m.id === medId) {
+          return {
+            ...m,
+            remainingPills: (m.remainingPills || 0) + quantity,
+          };
+        }
+        return m;
+      })
+    );
+
+    const newRefillOrder: PharmacyRefillOrder = {
+      id: `refill-${Date.now()}`,
+      medicationId: med.id,
+      medicationName: `${med.name} ${med.dosage}`,
+      rxNumber: med.rxNumber || 'RX-67120',
+      quantityOrdered: quantity,
+      orderedAt: new Date().toISOString().split('T')[0],
+      status: 'DISPATCHED',
+      pharmacyName: med.pharmacyName || 'Apollo Pharmacy #104',
+      deliveryAddress: profile.homeAddress,
+    };
+
+    setRefills((prev) => [newRefillOrder, ...prev]);
+
+    addAuditLog(
+      'Priya Sharma (Caregiver)',
+      'CAREGIVER',
+      `Refill Order Dispatched: ${med.name}`,
+      'MEDICATION',
+      `Dispatched refill order of ${quantity} tablets to ${med.pharmacyName || 'Apollo Pharmacy'}.`
+    );
+
+    showToast(`✓ Refill order dispatched for ${med.name} (${quantity} tablets)`);
+  };
+
+  // Trigger Emergency SOS
+  const handleTriggerEmergencySOS = () => {
+    addAuditLog(
+      'Dadi Kamala (Senior)',
+      'SENIOR',
+      'CRITICAL: Emergency SOS Beacon Activated',
+      'EMERGENCY',
+      `Emergency broadcast transmitted with GPS coordinates (12.9352° N, 77.6944° E) and blood type ${profile.bloodGroup}.`
+    );
+    showToast('🚨 EMERGENCY BEACON BROADCASTED TO CAREGIVERS AND SERVICES');
   };
 
   // Proactive Missed Dose Escalation Simulator
@@ -180,7 +343,14 @@ export default function Home() {
 
       const json = await res.json();
       if (json.delivery) {
-        setEmails(prev => [json.delivery, ...prev]);
+        setEmails((prev) => [json.delivery, ...prev]);
+        addAuditLog(
+          'Aegis System Dispatcher',
+          'SYSTEM',
+          'Missed Dose Escalation Email Dispatched',
+          'SECURITY',
+          'Automated escalation email sent to priya.sharma.care@gmail.com.'
+        );
         showToast('🚨 Missed dose escalation email dispatched to Priya & Rahul!');
         setIsEmailDrawerOpen(true);
       }
@@ -193,7 +363,7 @@ export default function Home() {
   const handleRunGeminiSafetyCheck = async () => {
     setIsAnalyzingSafety(true);
     try {
-      const medNames = medications.map(m => `${m.name} ${m.dosage}`);
+      const medNames = medications.map((m) => `${m.name} ${m.dosage}`);
       const res = await fetch('/api/gemini/safety-check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -201,6 +371,13 @@ export default function Home() {
       });
       const json = await res.json();
       if (json.success && json.data) {
+        addAuditLog(
+          'Gemini Clinical Safety Guardian',
+          'SYSTEM',
+          'Pharmacovigilance Interaction Scan',
+          'SAFETY',
+          'Drug-drug & dietary contraindications evaluated. Risk status: MODERATE_CAUTION.'
+        );
         showToast('✓ Gemini verified multi-drug safety & food contraindications');
       }
     } catch (err) {
@@ -212,9 +389,20 @@ export default function Home() {
 
   // Judge Scenario Selection
   const handleSelectJudgeScenario = (scenario: string) => {
-    if (scenario === 'senior') {
+    if (scenario === 'voice') {
       setCurrentPersona('senior');
-      showToast('Scenario Loaded: Senior Voice Mode');
+      setIsVoiceAssistantOpen(true);
+    } else if (scenario === 'pill-id') {
+      setCurrentPersona('senior');
+      setIsPillIdentifierOpen(true);
+    } else if (scenario === 'vitals') {
+      setCurrentPersona('family');
+      showToast('Loaded: Vitals Telemetry & Correlation Tab');
+    } else if (scenario === 'emergency') {
+      setIsEmergencyModalOpen(true);
+    } else if (scenario === 'pharmacy') {
+      setCurrentPersona('family');
+      setIsPharmacyRefillOpen(true);
     } else if (scenario === 'ocr') {
       setCurrentPersona('family');
       setIsScannerOpen(true);
@@ -225,7 +413,7 @@ export default function Home() {
   };
 
   const toggleSeniorFontSize = () => {
-    setSeniorFontSize(prev => prev === 'normal' ? 'large' : prev === 'large' ? 'extra-large' : 'normal');
+    setSeniorFontSize((prev) => (prev === 'normal' ? 'large' : prev === 'large' ? 'extra-large' : 'normal'));
   };
 
   return (
@@ -248,7 +436,7 @@ export default function Home() {
         unreadEmailCount={emails.length}
         seniorFontSize={seniorFontSize}
         onToggleFontSize={toggleSeniorFontSize}
-        onEmergencyCall={() => showToast(`🚨 Calling Primary Emergency Contact: ${profile.emergencyContact.name} (${profile.emergencyContact.phone})`)}
+        onEmergencyCall={() => setIsEmergencyModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -261,7 +449,10 @@ export default function Home() {
             onMarkDoseTaken={handleMarkDoseTaken}
             onSnoozeDose={handleSnoozeDose}
             seniorFontSize={seniorFontSize}
-            onEmergencyCall={() => showToast(`🚨 Calling Primary Emergency Contact: ${profile.emergencyContact.name} (${profile.emergencyContact.phone})`)}
+            onEmergencyCall={() => setIsEmergencyModalOpen(true)}
+            onOpenVoiceAssistant={() => setIsVoiceAssistantOpen(true)}
+            onOpenPillIdentifier={() => setIsPillIdentifierOpen(true)}
+            onOpenEmergencyModal={() => setIsEmergencyModalOpen(true)}
           />
         ) : (
           <FamilyPortal
@@ -271,10 +462,14 @@ export default function Home() {
             caregivers={caregivers}
             adherenceHistory={adherenceHistory}
             safetyAlerts={safetyAlerts}
+            vitals={vitals}
+            onAddVital={handleAddVital}
             onOpenScanner={() => setIsScannerOpen(true)}
             onOpenDoctorSummary={() => setIsDoctorSummaryOpen(true)}
             onOpenAddMedication={() => setIsAddMedOpen(true)}
             onOpenAddAppointment={() => setIsAddAptOpen(true)}
+            onOpenPharmacyRefill={() => setIsPharmacyRefillOpen(true)}
+            onOpenAuditTrail={() => setIsAuditTrailOpen(true)}
             onTriggerMissedDoseEscalation={handleTriggerMissedDoseEscalation}
             onDeleteMedication={handleDeleteMedication}
             onToggleDoseStatus={handleToggleDoseStatus}
@@ -330,6 +525,43 @@ export default function Home() {
         isOpen={isAddAptOpen}
         onClose={() => setIsAddAptOpen(false)}
         onAdd={handleAddAppointment}
+      />
+
+      <VoiceAssistantModal
+        isOpen={isVoiceAssistantOpen}
+        onClose={() => setIsVoiceAssistantOpen(false)}
+        medications={medications}
+        profile={profile}
+        onMarkDoseTaken={handleMarkDoseTaken}
+      />
+
+      <PillIdentifierModal
+        isOpen={isPillIdentifierOpen}
+        onClose={() => setIsPillIdentifierOpen(false)}
+        activeMedications={medications}
+      />
+
+      <PharmacyRefillModal
+        isOpen={isPharmacyRefillOpen}
+        onClose={() => setIsPharmacyRefillOpen(false)}
+        medications={medications}
+        profile={profile}
+        onRefillComplete={handleRefillComplete}
+        refills={refills}
+      />
+
+      <EmergencyMedicalIDModal
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setIsEmergencyModalOpen(false)}
+        profile={profile}
+        medications={medications}
+        onTriggerSOS={handleTriggerEmergencySOS}
+      />
+
+      <AuditTrailDrawer
+        isOpen={isAuditTrailOpen}
+        onClose={() => setIsAuditTrailOpen(false)}
+        logs={auditLogs}
       />
 
     </div>

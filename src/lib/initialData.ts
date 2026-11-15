@@ -1,4 +1,4 @@
-import { ElderlyProfile, Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, EmailNotification } from '@/types';
+import { ElderlyProfile, Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, EmailNotification, VitalReading, AuditLogEntry, PharmacyRefillOrder } from '@/types';
 
 export const INITIAL_PROFILE: ElderlyProfile = {
   id: 'elderly-001',
@@ -8,13 +8,20 @@ export const INITIAL_PROFILE: ElderlyProfile = {
   seniorPasscode: '1234',
   familyPasscode: '5678',
   bloodGroup: 'B+ Positive',
-  conditions: ['Type-2 Diabetes', 'Hypertension (High BP)', 'Mild Osteoarthritis'],
-  allergies: ['Penicillin', 'Sulfa drugs'],
+  conditions: ['Type-2 Diabetes Mellitus', 'Stage 1 Hypertension', 'Mild Osteoarthritis'],
+  allergies: ['Penicillin (Severe Anaphylaxis)', 'Sulfa Antibiotics'],
   emergencyContact: {
     name: 'Priya Sharma (Daughter)',
     phone: '+91 98450 12345',
-    relation: 'Daughter / Primary Caregiver',
+    relation: 'Daughter / Primary Healthcare Proxy',
   },
+  physician: {
+    name: 'Dr. Ramesh Patel, MD (Cardiology)',
+    clinic: 'Apex Heart Care & Diagnostic Center',
+    phone: '+91 80 2345 6789',
+  },
+  livingWillStatus: 'Full Code / Healthcare Proxy Assigned to Priya Sharma',
+  homeAddress: 'A-402, Green Glen Heights, Outer Ring Road, Bengaluru, KA 560103',
 };
 
 export const INITIAL_MEDICATIONS: Medication[] = [
@@ -31,6 +38,11 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     status: 'taken',
     lastTakenAt: 'Today at 8:35 AM',
     foodWarning: 'Take with food to avoid stomach upset',
+    remainingPills: 18,
+    totalPills: 60,
+    refillThreshold: 10,
+    rxNumber: 'RX-99214-MET',
+    pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
   },
   {
     id: 'med-2',
@@ -39,11 +51,16 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     frequency: 'Once daily',
     timeOfDay: 'morning',
     scheduledTime: '09:00 AM',
-    instructions: 'Take in the morning with or without food. Maintain regular timing.',
-    purpose: 'High blood pressure regulation & heart protection',
+    instructions: 'Take in the morning with water. Maintain consistent daily timing.',
+    purpose: 'High blood pressure regulation & vascular protection',
     pillColor: 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400',
     status: 'taken',
     lastTakenAt: 'Today at 9:02 AM',
+    remainingPills: 3, // LOW STOCK - REFILL NEEDED!
+    totalPills: 30,
+    refillThreshold: 7,
+    rxNumber: 'RX-67120-TEL',
+    pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
   },
   {
     id: 'med-3',
@@ -52,11 +69,16 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     frequency: 'Once daily before lunch',
     timeOfDay: 'afternoon',
     scheduledTime: '01:00 PM',
-    instructions: 'Take 15 minutes before lunch. Do not skip the meal after taking.',
-    purpose: 'Post-meal glucose management',
+    instructions: 'Take 15 minutes before lunch. Do not skip meal after ingestion.',
+    purpose: 'Post-prandial glycemic spike control',
     pillColor: 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400',
     status: 'upcoming',
     foodWarning: 'Always eat within 20 mins of taking to prevent hypoglycemia',
+    remainingPills: 22,
+    totalPills: 30,
+    refillThreshold: 7,
+    rxNumber: 'RX-88412-GLI',
+    pharmacyName: 'MedPlus Health Services - Outer Ring Rd',
   },
   {
     id: 'med-4',
@@ -66,10 +88,137 @@ export const INITIAL_MEDICATIONS: Medication[] = [
     timeOfDay: 'bedtime',
     scheduledTime: '09:30 PM',
     instructions: 'Take before sleep. Helps cholesterol balance and vascular health.',
-    purpose: 'Cholesterol & cardiovascular risk reduction',
+    purpose: 'Lipid reduction & cardiovascular prophylaxis',
     pillColor: 'border-purple-500 bg-purple-500/10 text-purple-600 dark:text-purple-400',
     status: 'upcoming',
     foodWarning: 'Avoid consuming grapefruit or grapefruit juice',
+    remainingPills: 14,
+    totalPills: 30,
+    refillThreshold: 5,
+    rxNumber: 'RX-77291-ATO',
+    pharmacyName: 'Apollo Pharmacy #104 - Bellandur',
+  },
+];
+
+export const INITIAL_VITALS: VitalReading[] = [
+  {
+    id: 'vit-1',
+    timestamp: 'Today at 08:45 AM',
+    dateStr: '2026-11-15',
+    bloodPressureSys: 118,
+    bloodPressureDia: 76,
+    bloodGlucose: 124, // Fasting mg/dL
+    heartRate: 72,
+    oxygenSaturation: 98,
+    notes: 'Taken 15 mins after morning Metformin & Telmisartan dose. Patient reports feeling energetic.',
+    flag: 'NORMAL',
+  },
+  {
+    id: 'vit-2',
+    timestamp: 'Yesterday at 07:30 PM',
+    dateStr: '2026-11-14',
+    bloodPressureSys: 122,
+    bloodPressureDia: 79,
+    bloodGlucose: 138, // Post-dinner
+    heartRate: 75,
+    oxygenSaturation: 97,
+    notes: 'Post-dinner checkup. Mild joint stiffness from evening garden stroll.',
+    flag: 'NORMAL',
+  },
+  {
+    id: 'vit-3',
+    timestamp: 'Yesterday at 08:30 AM',
+    dateStr: '2026-11-14',
+    bloodPressureSys: 132,
+    bloodPressureDia: 84,
+    bloodGlucose: 142,
+    heartRate: 80,
+    oxygenSaturation: 98,
+    notes: 'Slightly elevated BP prior to morning medicine. Normalized post-dose.',
+    flag: 'ELEVATED',
+  },
+  {
+    id: 'vit-4',
+    timestamp: '3 Days Ago at 09:00 AM',
+    dateStr: '2026-11-12',
+    bloodPressureSys: 120,
+    bloodPressureDia: 78,
+    bloodGlucose: 128,
+    heartRate: 70,
+    oxygenSaturation: 99,
+    notes: 'Routine morning baseline.',
+    flag: 'NORMAL',
+  },
+];
+
+export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
+  {
+    id: 'audit-1',
+    timestamp: 'Today at 09:02 AM',
+    actor: 'Dadi Kamala (Senior)',
+    role: 'SENIOR',
+    action: 'Dose Confirmed Taken',
+    category: 'MEDICATION',
+    details: 'Logged Telmisartan 40mg taken on schedule with 1-tap confirmation.',
+  },
+  {
+    id: 'audit-2',
+    timestamp: 'Today at 08:35 AM',
+    actor: 'Dadi Kamala (Senior)',
+    role: 'SENIOR',
+    action: 'Dose Confirmed Taken',
+    category: 'MEDICATION',
+    details: 'Logged Metformin 500mg taken after breakfast.',
+  },
+  {
+    id: 'audit-3',
+    timestamp: 'Today at 08:36 AM',
+    actor: 'Aegis System Dispatcher',
+    role: 'SYSTEM',
+    action: 'Proactive Alert Dispatched',
+    category: 'SECURITY',
+    details: 'Email delivered to Priya Sharma (priya.sharma.care@gmail.com) confirming on-time morning compliance.',
+  },
+  {
+    id: 'audit-4',
+    timestamp: 'Yesterday at 06:15 PM',
+    actor: 'Priya Sharma (Daughter)',
+    role: 'CAREGIVER',
+    action: 'Security Access: Caregiver Portal',
+    category: 'SECURITY',
+    details: 'Authenticated via Passcode 5678. Inspected adherence trends (94% weekly rating).',
+  },
+  {
+    id: 'audit-5',
+    timestamp: 'Yesterday at 06:20 PM',
+    actor: 'Clinical Safety Guardian',
+    role: 'SYSTEM',
+    action: 'Safety Check Evaluated',
+    category: 'SAFETY',
+    details: 'Automated drug-food scan executed. Flagged moderate Atorvastatin + Grapefruit caution.',
+  },
+  {
+    id: 'audit-6',
+    timestamp: '2 Days Ago at 11:00 AM',
+    actor: 'Dr. Ramesh Patel (Cardiology)',
+    role: 'PHYSICIAN',
+    action: 'Prescription Verified',
+    category: 'MEDICATION',
+    details: 'Verified Telmisartan 40mg daily morning regimen via telemedicine consultation.',
+  },
+];
+
+export const INITIAL_REFILLS: PharmacyRefillOrder[] = [
+  {
+    id: 'refill-01',
+    medicationId: 'med-1',
+    medicationName: 'Metformin Hydrochloride 500 mg',
+    rxNumber: 'RX-99214-MET',
+    quantityOrdered: 60,
+    orderedAt: '2026-11-01',
+    status: 'DELIVERED',
+    pharmacyName: 'Apollo Pharmacy #104',
+    deliveryAddress: 'A-402, Green Glen Heights, Bengaluru',
   },
 ];
 

@@ -1,6 +1,6 @@
 # 🛡️ AegisCare AI - Elderly Care & Medication Management Platform
 
-[![Next.js 15](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -26,14 +26,20 @@ Elderly individuals face significant cognitive and physical hurdles with polypha
 
 ### Architectural Core Concepts:
 1. **Passcode-Gated Dual-Persona Ecosystem**:
-   - **👵 Senior Mode (PIN: 1234)**: Ultra-large typography, high contrast, text-to-speech audio readout of scheduled doses, and massive 1-tap "✓ I TOOK THIS" confirmation buttons.
-   - **👨‍👩‍👧 Family Portal (PIN: 5678)**: Full adherence telemetry, remote regimen adjustments, prescription vision scanning, and escalation dispatch controls.
-2. **Google Gemini Multimodal Vision Prescription OCR**:
-   - Eliminates tedious, error-prone manual typing. Uploading or snapping a prescription image triggers Gemini 2.5 Flash to parse doctor handwriting, Latin sig codes (OD, BD, PC, AC), and dosages into structured JSON schedules.
-3. **Clinical Safety & Drug-Drug / Food Interaction Guardian**:
-   - Gemini evaluates the patient's multi-drug stack in real-time, detecting critical interactions (e.g. Atorvastatin with Grapefruit) and dietary guidelines.
-4. **Proactive Multi-Tier Email Escalation Engine**:
-   - If a scheduled medication is not confirmed within 60 minutes, the serverless notification engine automatically dispatches an urgent email alert to the family care network.
+   - **👵 Senior Mode (PIN: 1234)**: Ultra-large typography, high contrast, text-to-speech audio readout of scheduled doses, conversational voice assistant, and massive 1-tap "✓ I TOOK THIS" confirmation buttons.
+   - **👨‍👩‍👧 Family Portal (PIN: 5678)**: Full adherence telemetry, remote regimen adjustments, prescription vision scanning, biometrics tracking, doorstep pharmacy auto-refills, and escalation dispatch controls.
+2. **Aegis Conversational Voice Companion**:
+   - Natural language voice interaction powered by Web Speech API and Gemini 2.5 Flash. Seniors can ask *"Did I take my morning medicines?"* or *"What should I take now?"* and receive spoken and visual guidance.
+3. **AI Computer Vision Pill Identifier**:
+   - Inspects loose tablets by color, shape, and score marks against active prescriptions to prevent mix-ups before ingestion.
+4. **Physiological Vitals Telemetry & Clinical Correlation Engine**:
+   - Tracks Blood Pressure, Fasting Glucose, Heart Rate, and SpO2. Correlates biometrics with drug administration timestamps using Gemini 2.5 Flash to generate clinical efficacy insights.
+5. **Smart Pharmacy Inventory & Doorstep Auto-Refill**:
+   - Tracks remaining pill counts with automated depletion forecasts. Triggers 1-click Electronic Refill Orders with Rx # and pharmacy routing when supply falls below 4 days.
+6. **Paramedic Emergency Medical ID & 1-Tap SOS Beacon**:
+   - Unblocked lockscreen card displaying blood type (B+), critical allergies (Penicillin, Sulfa), GPS coordinates, and attending physician details with 1-tap SOS broadcasting.
+7. **HIPAA-Grade Immutable Audit Trail**:
+   - Tamper-evident event log recording all senior dose confirmations, schedule updates, caregiver authentications, and automated email dispatches with CSV export.
 
 ---
 
@@ -46,52 +52,62 @@ flowchart TD
     subgraph Users["User Layer"]
         Senior["👵 Senior Mode (PIN: 1234)"]
         Family["👨‍👩‍👧 Family & Caregiver Portal (PIN: 5678)"]
+        Emergency["🚨 Paramedics / Emergency SOS"]
     end
 
-    subgraph Frontend["Modern Next.js 15 Client"]
+    subgraph Frontend["Modern Next.js Client"]
         Nav["Passcode Authentication & Navbar"]
         SeniorUI["Voice Readout & 1-Tap Dose Confirmation"]
+        VoiceComp["Aegis Conversational Voice Companion"]
+        PillID["AI Computer Vision Pill Identifier"]
         FamilyUI["Adherence Analytics & Schedule Manager"]
-        DoctorSummary["Printable Clinical Summary Sheet"]
+        VitalsTrack["Vitals Telemetry & Correlation Engine"]
+        PharmRefill["Pharmacy Inventory & Refill Hub"]
+        AuditTrail["HIPAA Audit Trail & Export"]
+        MedicalID["Paramedic Emergency Medical ID"]
     end
 
     subgraph Intelligence["Google Gemini 2.5 Flash Layer"]
         GeminiVision["Multimodal Prescription OCR (/api/gemini/analyze-prescription)"]
+        GeminiPill["Pill Vision Identification (/api/gemini/identify-pill)"]
+        GeminiVoice["Voice Companion Q&A (/api/gemini/voice-companion)"]
+        GeminiVitals["Biometric Clinical Correlation (/api/gemini/correlate-vitals)"]
         GeminiSafety["Clinical Drug Interaction Guardian (/api/gemini/safety-check)"]
     end
 
     subgraph Notification["Proactive Communication Engine"]
         EmailGateway["Serverless Email Dispatcher (/api/notify/email)"]
-        Alerts["Upcoming Dose & Missed Dose Escalation Alerts"]
+        Alerts["Missed Dose Escalation, Refills & SOS Alerts"]
     end
 
     Senior --> Nav
     Family --> Nav
+    Emergency --> MedicalID
     Nav --> SeniorUI
     Nav --> FamilyUI
+    SeniorUI --> VoiceComp
+    SeniorUI --> PillID
+    FamilyUI --> VitalsTrack
+    FamilyUI --> PharmRefill
+    FamilyUI --> AuditTrail
     SeniorUI -->|Logs Dose| EmailGateway
+    VoiceComp --> GeminiVoice
+    PillID --> GeminiPill
+    VitalsTrack --> GeminiVitals
     FamilyUI -->|Scans Rx| GeminiVision
     FamilyUI -->|Verifies Regimen| GeminiSafety
-    FamilyUI -->|Generates Sheet| DoctorSummary
     SeniorUI -.->|Unconfirmed > 60m| Alerts
     Alerts --> EmailGateway
 ```
-
-### End-to-End User Journey:
-1. **Morning Routine**: Dadi Kamala opens the app on her tablet. A warm greeting appears with her morning medications. She taps **"Read Aloud My Medicines"** to hear audio instructions, takes her pills with breakfast, and taps **"I TOOK THIS"**.
-2. **Instant Telemetry**: A confetti celebration triggers, updating her 7-day adherence graph to 94%, and sending a peaceful notification to her daughter Priya.
-3. **Prescription Update**: Priya visits Dr. Ramesh Patel with Dadi. She taps **"Scan Prescription"**, snaps the doctor's slip, and Gemini extracts *Amlodipine 5mg* and *Vitamin D3*, instantly syncing to Dadi's Senior View.
-4. **Safety Verification**: Gemini automatically flags that Atorvastatin must not be taken with grapefruit, updating dietary advisories across both portals.
-5. **Missed Dose Safety Net**: If Dadi forgets her afternoon insulin/oral dose, an automated escalation alert is dispatched to Priya and Rahul to check in promptly.
 
 ---
 
 ## 📋 4. Assumptions Made
 
-1. **Passcode Access Model**: Simple 4-digit numeric passcodes (`1234` for Senior, `5678` for Family) were chosen over complex passwords or 2FA SMS codes to ensure high accessibility for elderly users and immediate family delegation.
-2. **Network Resilience**: In real-world clinics and remote locations, connectivity may be intermittent. The app includes resilient fallback datasets ensuring 100% functionality and zero white-screen crashes even during network outages.
-3. **Notifications**: The notification system uses a serverless REST gateway supporting direct integration with SendGrid/SMTP, accompanied by an interactive in-app telemetry drawer for live review.
-4. **Data Privacy**: Patient medical profiles and adherence history are scoped per family ecosystem.
+1. **Passcode Access Model**: Simple 4-digit numeric passcodes (`1234` for Senior, `5678` for Family) ensure high accessibility for elderly users while maintaining authorized boundary controls.
+2. **Paramedic Lockscreen Access**: Critical Emergency Medical ID is accessible immediately without entering a passcode, prioritizing patient survival during acute emergencies.
+3. **Network Resilience**: In real-world clinics and remote locations, connectivity may be intermittent. The app includes resilient fallback datasets ensuring 100% functionality and zero white-screen crashes even during network outages.
+4. **Data Privacy**: Patient medical profiles, vitals telemetry, and adherence history are scoped per family ecosystem with immutable audit trails.
 
 ---
 
@@ -99,11 +115,11 @@ flowchart TD
 
 | Dimension | Technologies Used |
 | :--- | :--- |
-| **Framework** | Next.js 15 (App Router), React 19, TypeScript (Strict Mode) |
-| **Styling & UI** | Tailwind CSS v4, Lucide React Icons, Framer Motion, Canvas Confetti |
+| **Framework** | Next.js 16 (Turbopack), React 19, TypeScript (Strict Mode) |
+| **Styling & UI** | Tailwind CSS v4, Lucide React Icons, Canvas Confetti |
 | **AI Engine** | Google Gemini 2.5 Flash via official `@google/genai` SDK |
 | **Validation & Quality** | Zod Runtime Schema Validation, ESLint, TypeScript Typechecking |
-| **DevOps & Hosting** | Vercel Edge Platform, GitHub Actions CI Pipeline, Multi-Stage Dockerfile |
+| **DevOps & Hosting** | Vercel Edge Platform, GitHub Actions CI Pipeline, Docker Container |
 
 ---
 
@@ -118,12 +134,11 @@ flowchart TD
 git clone https://github.com/Yathish66/aegis-care-elderly-platform.git
 cd aegis-care-elderly-platform
 
-# 2. Install dependencies (instant via local pnpm store)
+# 2. Install dependencies
 pnpm install
 
-# 3. Configure API Key
+# 3. Configure API Key (optional, resilient fallback mode active by default)
 cp .env.example .env.local
-# Add GEMINI_API_KEY (optional, fallback demo mode available)
 
 # 4. Run Development Server
 pnpm dev

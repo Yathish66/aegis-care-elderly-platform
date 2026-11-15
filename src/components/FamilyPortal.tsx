@@ -1,3 +1,4 @@
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -19,9 +20,13 @@ import {
   Trash2,
   Edit,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Activity,
+  ShoppingBag,
+  ShieldCheck
 } from 'lucide-react';
-import { Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, ElderlyProfile } from '@/types';
+import { Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, ElderlyProfile, VitalReading } from '@/types';
+import { VitalsTracker } from '@/components/VitalsTracker';
 
 interface FamilyPortalProps {
   profile: ElderlyProfile;
@@ -30,10 +35,14 @@ interface FamilyPortalProps {
   caregivers: Caregiver[];
   adherenceHistory: AdherenceDay[];
   safetyAlerts: SafetyAlert[];
+  vitals: VitalReading[];
+  onAddVital: (vital: VitalReading) => void;
   onOpenScanner: () => void;
   onOpenDoctorSummary: () => void;
   onOpenAddMedication: () => void;
   onOpenAddAppointment: () => void;
+  onOpenPharmacyRefill: () => void;
+  onOpenAuditTrail: () => void;
   onTriggerMissedDoseEscalation: () => void;
   onDeleteMedication: (id: string) => void;
   onToggleDoseStatus: (id: string) => void;
@@ -48,17 +57,21 @@ export function FamilyPortal({
   caregivers,
   adherenceHistory,
   safetyAlerts,
+  vitals,
+  onAddVital,
   onOpenScanner,
   onOpenDoctorSummary,
   onOpenAddMedication,
   onOpenAddAppointment,
+  onOpenPharmacyRefill,
+  onOpenAuditTrail,
   onTriggerMissedDoseEscalation,
   onDeleteMedication,
   onToggleDoseStatus,
   onRunGeminiSafetyCheck,
   isAnalyzingSafety,
 }: FamilyPortalProps) {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'schedule' | 'appointments' | 'escalation'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'schedule' | 'vitals' | 'pharmacy' | 'appointments' | 'escalation'>('analytics');
 
   // Adherence calculations
   const totalWeeklyDoses = adherenceHistory.reduce((acc, d) => acc + d.totalDoses, 0);
@@ -80,11 +93,27 @@ export function FamilyPortal({
               Caregiver Portal for {profile.fullName} (Age {profile.age})
             </h1>
             <p className="text-slate-300 text-sm font-medium">
-              Real-time adherence monitoring, remote schedule updates, and proactive escalation alerts.
+              Real-time adherence monitoring, biometrics telemetry, remote pharmacy refills, and proactive escalation.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={onOpenPharmacyRefill}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-700/30 transition-all active:scale-95"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Pharmacy Hub</span>
+            </button>
+
+            <button
+              onClick={onOpenAuditTrail}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-bold text-xs sm:text-sm transition-all"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Audit Trail</span>
+            </button>
+
             <button
               onClick={onOpenScanner}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-teal-700/30 transition-all active:scale-95"
@@ -128,6 +157,30 @@ export function FamilyPortal({
         >
           <Pill className="w-4 h-4 text-teal-600" />
           <span>Medication Schedule ({medications.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('vitals')}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
+            activeTab === 'vitals'
+              ? 'bg-background text-foreground shadow-md'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Activity className="w-4 h-4 text-emerald-600" />
+          <span>Vitals & Correlation</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('pharmacy')}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
+            activeTab === 'pharmacy'
+              ? 'bg-background text-foreground shadow-md'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <ShoppingBag className="w-4 h-4 text-blue-600" />
+          <span>Pharmacy & Refills</span>
         </button>
 
         <button
@@ -198,73 +251,74 @@ export function FamilyPortal({
               </div>
               <div className="text-3xl font-black text-foreground">{medications.length} Regimens</div>
               <p className="text-xs text-muted-foreground mt-1 font-semibold">
-                Covering Diabetes, BP & Statin
+                Under care of Dr. Ramesh Patel
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-card border border-border shadow-sm">
               <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-bold text-muted-foreground uppercase">Next Doctor Visit</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase">Next Scheduled Visit</span>
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 border border-purple-500/20">
-                  IN 5 DAYS
+                  CONFIRMED
                 </span>
               </div>
-              <div className="text-xl font-black text-foreground truncate">Dr. Ramesh Patel</div>
+              <div className="text-xl font-black text-foreground truncate">{appointments[0]?.doctorName || 'None'}</div>
               <p className="text-xs text-muted-foreground mt-1 font-semibold">
-                Nov 20 · 10:30 AM (Apex Heart Care)
+                {appointments[0]?.date} at {appointments[0]?.time}
               </p>
             </div>
 
           </div>
 
-          {/* 7-Day Adherence Timeline Chart */}
+          {/* Adherence Chart Bar Visualizer */}
           <div className="p-6 rounded-3xl bg-card border border-border shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-black text-foreground">7-Day Dose Compliance Trend</h3>
-                <p className="text-xs text-muted-foreground font-medium">Daily adherence records logged across senior and family access</p>
+                <h3 className="text-lg font-black text-foreground">7-Day Adherence Trajectory</h3>
+                <p className="text-xs text-muted-foreground">Historical compliance based on timestamped confirmations</p>
               </div>
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal-500/10 text-teal-600 border border-teal-500/20">
-                Weekly Target: 90%+
+              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                Target: 90%+
               </span>
             </div>
 
-            <div className="grid grid-cols-7 gap-2 sm:gap-4 pt-4">
+            <div className="grid grid-cols-7 gap-2 pt-4">
               {adherenceHistory.map((day, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-2">
-                  <div className="w-full bg-muted/60 h-32 rounded-2xl relative flex items-end p-1.5 overflow-hidden">
+                  <div className="text-xs font-black text-foreground">{day.percentage}%</div>
+                  <div className="w-full bg-muted rounded-xl h-36 flex items-end p-1.5 overflow-hidden">
                     <div 
-                      className={`w-full rounded-xl transition-all duration-500 ${
+                      className={`w-full rounded-lg transition-all duration-500 ${
                         day.percentage === 100 
-                          ? 'bg-emerald-500' 
-                          : day.percentage >= 75 
-                          ? 'bg-amber-500' 
-                          : 'bg-rose-500'
+                          ? 'bg-gradient-to-t from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/20' 
+                          : 'bg-gradient-to-t from-amber-500 to-amber-400'
                       }`}
                       style={{ height: `${day.percentage}%` }}
                     />
                   </div>
-                  <span className="text-xs font-black text-foreground">{day.day}</span>
-                  <span className="text-[10px] font-bold text-muted-foreground">{day.percentage}%</span>
+                  <span className="text-xs font-bold text-muted-foreground">{day.day}</span>
+                  <span className="text-[10px] font-medium text-muted-foreground">{day.takenDoses}/{day.totalDoses} doses</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Gemini AI Drug-Drug Interaction Guardian */}
-          <div className="p-6 rounded-3xl bg-amber-500/10 border-2 border-amber-500/30 space-y-4">
+          {/* Clinical Safety & Drug Interaction Guardian Box */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/5 via-card to-card border-2 border-amber-500/30 shadow-md space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md">
-                  <ShieldAlert className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center flex-shrink-0">
+                  <ShieldAlert className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-foreground flex items-center gap-2">
-                    <span>Google Gemini Clinical Safety Guardian</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500 text-white">AI EVALUATED</span>
+                  <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                    <span>Clinical Drug & Food Interaction Guardian</span>
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                      Gemini 2.5 Flash
+                    </span>
                   </h3>
-                  <p className="text-xs text-muted-foreground font-medium">
-                    Continuous monitoring of multi-drug regimens and dietary contraindications
+                  <p className="text-xs text-muted-foreground">
+                    Automated pharmacovigilance scan against senior's active regimen and medical history.
                   </p>
                 </div>
               </div>
@@ -272,29 +326,29 @@ export function FamilyPortal({
               <button
                 onClick={onRunGeminiSafetyCheck}
                 disabled={isAnalyzingSafety}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-xs transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>{isAnalyzingSafety ? 'Gemini Reasoning...' : 'Re-verify Drug Safety'}</span>
+                <Sparkles className={`w-4 h-4 ${isAnalyzingSafety ? 'animate-spin' : ''}`} />
+                <span>{isAnalyzingSafety ? 'Scanning Regimen...' : 'Re-verify with Gemini'}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="grid gap-3 pt-2">
               {safetyAlerts.map((alert) => (
-                <div key={alert.id} className="p-4 rounded-2xl bg-card border border-border space-y-2">
+                <div key={alert.id} className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <span className="text-xs font-black text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
                       <AlertTriangle className="w-4 h-4" />
                       {alert.title}
                     </span>
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300">
                       {alert.severity}
                     </span>
                   </div>
-                  <p className="text-xs text-foreground font-medium leading-relaxed">
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">
                     {alert.description}
                   </p>
-                  <p className="text-[11px] font-bold text-teal-700 dark:text-teal-300 bg-teal-500/10 p-2 rounded-xl border border-teal-500/20">
+                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                     💡 Action: {alert.actionRecommendation}
                   </p>
                 </div>
@@ -305,27 +359,19 @@ export function FamilyPortal({
         </div>
       )}
 
-      {/* TAB 2: MEDICATION SCHEDULE MANAGER */}
+      {/* TAB 2: SCHEDULE MANAGEMENT */}
       {activeTab === 'schedule' && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-black text-foreground">Current Active Medication Regimens</h2>
-              <p className="text-xs text-muted-foreground">Authorized caretakers can add, edit, or adjust dose timings with immediate sync to Senior View.</p>
+              <h2 className="text-xl font-black text-foreground">Active Medication Regimens</h2>
+              <p className="text-xs text-muted-foreground">Authorized caretakers can add, edit, or adjust medication schedules in real-time.</p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={onOpenScanner}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md transition-all"
-              >
-                <Camera className="w-4 h-4" />
-                <span>Scan Rx (Gemini Vision)</span>
-              </button>
-
-              <button
                 onClick={onOpenAddMedication}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-all"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Medication</span>
@@ -333,46 +379,43 @@ export function FamilyPortal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid gap-3">
             {medications.map((med) => (
-              <div key={med.id} className="p-5 rounded-2xl bg-card border border-border shadow-sm space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
-                      {med.timeOfDay} · {med.scheduledTime}
+              <div key={med.id} className="p-5 rounded-2xl bg-card border border-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-black text-foreground">{med.name}</span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground">
+                      {med.dosage}
                     </span>
-                    <h3 className="text-lg font-black text-foreground">{med.name}</h3>
-                    <p className="text-xs font-bold text-teal-600 dark:text-teal-400">Dosage: {med.dosage} ({med.frequency})</p>
+                    <span className="text-xs font-mono font-bold text-teal-600 dark:text-teal-400">
+                      ⏰ {med.scheduledTime} ({med.timeOfDay})
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => onToggleDoseStatus(med.id)}
-                      title="Toggle Taken/Pending"
-                      className={`p-2 rounded-xl border text-xs font-bold transition-all ${
-                        med.status === 'taken' 
-                          ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30' 
-                          : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
-                      }`}
-                    >
-                      {med.status === 'taken' ? '✓ Taken' : 'Pending'}
-                    </button>
-                    <button
-                      onClick={() => onDeleteMedication(med.id)}
-                      title="Remove Medication"
-                      className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">{med.instructions}</p>
+                  <p className="text-[11px] text-teal-600 font-semibold">Purpose: {med.purpose}</p>
                 </div>
 
-                <div className="text-xs text-muted-foreground bg-muted/40 p-3 rounded-xl border border-border/60">
-                  <p className="font-semibold text-foreground">Instructions: {med.instructions}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">Clinical Goal: {med.purpose}</p>
-                  {med.foodWarning && (
-                    <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400 mt-1">⚠️ Advisory: {med.foodWarning}</p>
-                  )}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onToggleDoseStatus(med.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      med.status === 'taken'
+                        ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                        : 'bg-muted hover:bg-muted/80 text-foreground'
+                    }`}
+                  >
+                    Status: {med.status === 'taken' ? '✓ Taken' : 'Upcoming'}
+                  </button>
+
+                  <button
+                    onClick={() => onDeleteMedication(med.id)}
+                    className="p-2 rounded-xl text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 transition-colors"
+                    title="Remove Medication"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))}
@@ -380,22 +423,97 @@ export function FamilyPortal({
         </div>
       )}
 
-      {/* TAB 3: DOCTOR APPOINTMENTS */}
+      {/* TAB 3: VITALS & CLINICAL CORRELATION */}
+      {activeTab === 'vitals' && (
+        <VitalsTracker
+          vitals={vitals}
+          onAddVital={onAddVital}
+          medications={medications}
+          profile={profile}
+        />
+      )}
+
+      {/* TAB 4: PHARMACY & REFILLS */}
+      {activeTab === 'pharmacy' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-card border border-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                Pharmacy Inventory & Fulfillment Hub
+              </h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Track remaining pill stocks, forecast days of supply, and dispatch 1-click doorstep refill orders.
+              </p>
+            </div>
+            <button
+              onClick={onOpenPharmacyRefill}
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              <span>Launch Refill Center</span>
+            </button>
+          </div>
+
+          <div className="grid gap-3">
+            {medications.map((m) => {
+              const remaining = m.remainingPills ?? 15;
+              const isLow = remaining <= (m.refillThreshold ?? 5);
+
+              return (
+                <div
+                  key={m.id}
+                  className={`p-5 rounded-2xl border flex items-center justify-between gap-4 ${
+                    isLow
+                      ? 'border-rose-300 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900 dark:text-white text-base">{m.name}</span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold">{m.dosage}</span>
+                      {isLow && (
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                          Low Stock: {remaining} left
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Fulfillment: {m.pharmacyName || 'Apollo Pharmacy #104'} • Rx #{m.rxNumber || 'RX-99214'}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={onOpenPharmacyRefill}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                      isLow ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                  >
+                    Order Refill
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: DOCTOR APPOINTMENTS */}
       {activeTab === 'appointments' && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-black text-foreground">Scheduled Doctor Consultations</h2>
-              <p className="text-xs text-muted-foreground">Keep doctor routines synchronized; proactive reminders are automatically dispatched to family members.</p>
+              <h2 className="text-xl font-black text-foreground">Upcoming Clinical Consultations</h2>
+              <p className="text-xs text-muted-foreground">Keep family members coordinated with prep guidelines and consultation times.</p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={onOpenDoctorSummary}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition-all"
               >
                 <FileText className="w-4 h-4" />
-                <span>Generate Clinical Summary Sheet</span>
+                <span>Print Visit Sheet</span>
               </button>
 
               <button
@@ -439,7 +557,7 @@ export function FamilyPortal({
         </div>
       )}
 
-      {/* TAB 4: ESCALATION & PROACTIVE EMAIL ALERTS */}
+      {/* TAB 6: ESCALATION & PROACTIVE EMAIL ALERTS */}
       {activeTab === 'escalation' && (
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
