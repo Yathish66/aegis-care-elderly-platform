@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { Medication, DoctorAppointment, Caregiver, AdherenceDay, SafetyAlert, ElderlyProfile, VitalReading } from '@/types';
 import { VitalsTracker } from '@/components/VitalsTracker';
+import { SupportedLanguage, TRANSLATIONS } from '@/lib/i18n';
 
 interface FamilyPortalProps {
   profile: ElderlyProfile;
@@ -50,6 +51,7 @@ interface FamilyPortalProps {
   onRunGeminiSafetyCheck: () => void;
   isAnalyzingSafety: boolean;
   onOpenProfileSetup?: () => void;
+  language?: SupportedLanguage;
 }
 
 export function FamilyPortal({
@@ -73,8 +75,11 @@ export function FamilyPortal({
   onRunGeminiSafetyCheck,
   isAnalyzingSafety,
   onOpenProfileSetup,
+  language = 'en',
 }: FamilyPortalProps) {
   const [activeTab, setActiveTab] = useState<'analytics' | 'schedule' | 'vitals' | 'pharmacy' | 'appointments' | 'escalation'>('analytics');
+
+  const t = TRANSLATIONS[language].family;
 
   // Adherence calculations
   const totalWeeklyDoses = adherenceHistory.reduce((acc, d) => acc + d.totalDoses, 0);
@@ -93,10 +98,10 @@ export function FamilyPortal({
               <span>Passcode Verified Caregiver Ecosystem</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Caregiver Portal for {profile.fullName} (Age {profile.age})
+              {t.caregiverPortalTitle} {profile.fullName} (Age {profile.age})
             </h1>
             <p className="text-slate-300 text-sm font-medium">
-              Real-time adherence monitoring, biometrics telemetry, remote pharmacy refills, and proactive escalation.
+              {t.caregiverSubtitle}
             </p>
           </div>
 
@@ -106,7 +111,7 @@ export function FamilyPortal({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-700/30 transition-all active:scale-95"
             >
               <UserCog className="w-4 h-4" />
-              <span>Personalize Profile</span>
+              <span>{t.personalizeProfile}</span>
             </button>
 
             <button
@@ -114,7 +119,7 @@ export function FamilyPortal({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-700/30 transition-all active:scale-95"
             >
               <ShoppingBag className="w-4 h-4" />
-              <span>Pharmacy Hub</span>
+              <span>{t.pharmacyHub}</span>
             </button>
 
             <button
@@ -122,7 +127,7 @@ export function FamilyPortal({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-bold text-xs sm:text-sm transition-all"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Audit Trail</span>
+              <span>{t.auditTrail}</span>
             </button>
 
             <button
@@ -130,7 +135,7 @@ export function FamilyPortal({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-teal-700/30 transition-all active:scale-95"
             >
               <Camera className="w-4 h-4" />
-              <span>Scan Prescription (Gemini OCR)</span>
+              <span>{t.scanPrescription}</span>
             </button>
 
             <button
@@ -138,7 +143,7 @@ export function FamilyPortal({
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-bold text-xs sm:text-sm transition-all"
             >
               <FileText className="w-4 h-4 text-teal-400" />
-              <span>Doctor Visit Summary</span>
+              <span>{t.doctorVisitSummary}</span>
             </button>
           </div>
         </div>
@@ -155,7 +160,7 @@ export function FamilyPortal({
           }`}
         >
           <TrendingUp className="w-4 h-4 text-teal-600" />
-          <span>Adherence & Analytics</span>
+          <span>{t.analyticsTab}</span>
         </button>
 
         <button
@@ -167,7 +172,7 @@ export function FamilyPortal({
           }`}
         >
           <Pill className="w-4 h-4 text-teal-600" />
-          <span>Medication Schedule ({medications.length})</span>
+          <span>{t.scheduleTab} ({medications.length})</span>
         </button>
 
         <button
@@ -179,7 +184,7 @@ export function FamilyPortal({
           }`}
         >
           <Activity className="w-4 h-4 text-emerald-600" />
-          <span>Vitals & Correlation</span>
+          <span>{t.vitalsTab}</span>
         </button>
 
         <button
@@ -191,7 +196,7 @@ export function FamilyPortal({
           }`}
         >
           <ShoppingBag className="w-4 h-4 text-blue-600" />
-          <span>Pharmacy & Refills</span>
+          <span>{t.pharmacyTab}</span>
         </button>
 
         <button
@@ -203,7 +208,7 @@ export function FamilyPortal({
           }`}
         >
           <Calendar className="w-4 h-4 text-teal-600" />
-          <span>Doctor Appointments ({appointments.length})</span>
+          <span>{t.appointmentsTab} ({appointments.length})</span>
         </button>
 
         <button

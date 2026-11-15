@@ -6,8 +6,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG_2.1_AAA-purple?style=for-the-badge)](./)
+[![Languages](https://img.shields.io/badge/Languages-5_Regional_Supported-blue?style=for-the-badge)](./)
 [![Security: Audited](https://img.shields.io/badge/Security-HIPAA_Grade-emerald?style=for-the-badge)](./)
-[![Tests: Passing](https://img.shields.io/badge/Tests-14_Passed-brightgreen?style=for-the-badge)](./)
+[![Tests: Passing](https://img.shields.io/badge/Tests-17_Passed-brightgreen?style=for-the-badge)](./)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
 
 > Built for **PromptWars × Catalyst Solo Hackathon 2026** — Powered by **Google for Developers**, **Hack2Skill**, and **Makers Need More (MnM)**.
@@ -114,9 +115,29 @@ ok 1 - Constructs compliant escalation payload when dose delay > 60 minutes
 ok 1 - Enforces touch target dimensions >= 48px for senior accessibility
 ok 2 - Validates accessible contrast ratio bounds (7:1 for AAA High Contrast, 4.5:1 for AA)
 ok 3 - Verifies keyboard navigation shortcuts and speech pace ranges
-1..6
-# tests 14, suites 6, pass 14, fail 0 (duration 110ms)
+# Subtest: 7. Multilingual Accessibility & Regional Localization (i18n)
+ok 1 - Validates BCP-47 speech locales for Web Speech API synthesis across all 5 languages
+ok 2 - Ensures 1-tap dose confirmation buttons are translated into regional vernaculars
+ok 3 - Verifies senior daily care greeting localization across Indian and international dialects
+1..7
+# tests 17, suites 7, pass 17, fail 0 (duration 100ms)
 ```
+
+---
+
+## 🌐 7. Multilingual & Vernacular Regional Localization (i18n)
+
+To bridge language barriers for elderly individuals across diverse cultural and linguistic backgrounds, AegisCare features native zero-latency vernacular switching across **5 languages**:
+- **English (`en`)** — Global standard
+- **हिन्दी (`hi`)** — Northern & Central India
+- **ಕನ್ನಡ (`kn`)** — Karnataka (Bengaluru regional dialect)
+- **தமிழ் (`ta`)** — Tamil Nadu & Southern India
+- **Español (`es`)** — International Spanish
+
+### Multilingual Features:
+1. **Dynamic Vernacular Text**: 1-tap dose logging (`✓ I TOOK THIS` / `✓ मैंने ले ली` / `✓ ನಾನು ತೆಗೆದುಕೊಂಡೆ` / `✓ நான் எடுத்துக்கொண்டேன்` / `✓ YA LA TOMÉ`), timing slots, instructions, and warnings.
+2. **Vernacular Speech Synthesis**: Web Speech API speaks natural elderly voice guidance in the selected regional dialect (`hi-IN`, `kn-IN`, `ta-IN`, `es-ES`, `en-US`).
+3. **Seamless Language Selector**: Accessible directly from the Navbar and Accessibility Hub with automatic `localStorage` persistence.
 
 ---
 

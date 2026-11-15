@@ -17,6 +17,8 @@ import {
   Eye,
   UserCog
 } from 'lucide-react';
+import { SupportedLanguage, TRANSLATIONS } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 interface NavbarProps {
   currentPersona: 'senior' | 'family';
@@ -30,6 +32,8 @@ interface NavbarProps {
   onOpenSecurityArchitecture?: () => void;
   onOpenAccessibility?: () => void;
   onOpenProfileSetup?: () => void;
+  language?: SupportedLanguage;
+  onSelectLanguage?: (lang: SupportedLanguage) => void;
 }
 
 export function Navbar({
@@ -44,7 +48,10 @@ export function Navbar({
   onOpenSecurityArchitecture,
   onOpenAccessibility,
   onOpenProfileSetup,
+  language = 'en',
+  onSelectLanguage,
 }: NavbarProps) {
+  const t = TRANSLATIONS[language].navbar;
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +89,7 @@ export function Navbar({
               }`}
             >
               <User className="w-4 h-4" />
-              <span>Senior View</span>
+              <span>{t.seniorView}</span>
             </button>
 
             <button
@@ -94,7 +101,7 @@ export function Navbar({
               }`}
             >
               <Users className="w-4 h-4" />
-              <span>Family & Caregiver</span>
+              <span>{t.familyPortal}</span>
               <Lock className="w-3 h-3 opacity-60" />
             </button>
           </div>
@@ -102,6 +109,14 @@ export function Navbar({
           {/* Action Tools */}
           <div className="flex items-center gap-2">
             
+            {/* Multilingual Selector */}
+            {onSelectLanguage && (
+              <LanguageSelector
+                currentLanguage={language}
+                onSelectLanguage={onSelectLanguage}
+              />
+            )}
+
             {/* Font Zoom for Accessibility */}
             {currentPersona === 'senior' && (
               <button
@@ -137,7 +152,7 @@ export function Navbar({
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 border border-teal-500/30 text-xs font-bold transition-all"
             >
               <UserCog className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-              <span className="hidden sm:inline">Profile Setup</span>
+              <span className="hidden sm:inline">{t.profileSetup}</span>
             </button>
 
             {/* Accessibility & Sensory Hub (WCAG AAA) */}
@@ -147,7 +162,7 @@ export function Navbar({
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all"
             >
               <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">A11y Hub</span>
+              <span className="hidden sm:inline">{t.a11yHub}</span>
             </button>
 
             {/* Security Architecture & HIPAA Whitepaper */}
@@ -157,7 +172,7 @@ export function Navbar({
               className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Security & Data</span>
+              <span>{t.securityData}</span>
             </button>
 
             {/* IIT Kharagpur Jury Tour Mode */}
@@ -166,7 +181,7 @@ export function Navbar({
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm font-black shadow-md shadow-orange-500/20 transition-all active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Judge Walkthrough</span>
+              <span className="hidden sm:inline">{t.judgeWalkthrough}</span>
               <span className="sm:hidden">Tour</span>
             </button>
 
@@ -176,7 +191,7 @@ export function Navbar({
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs sm:text-sm font-bold transition-all"
             >
               <PhoneCall className="w-4 h-4 text-rose-500 animate-bounce" />
-              <span className="hidden lg:inline">SOS Help</span>
+              <span className="hidden lg:inline">{t.sosHelp}</span>
             </button>
 
           </div>

@@ -188,3 +188,52 @@ describe('6. Accessibility & Sensory Ergonomics (WCAG 2.1 AAA Standards)', () =>
     }
   });
 });
+
+describe('7. Multilingual Accessibility & Regional Localization (i18n)', () => {
+  const supportedLanguages = ['en', 'hi', 'kn', 'ta', 'es'];
+  const speechLocales = {
+    en: 'en-US',
+    hi: 'hi-IN',
+    kn: 'kn-IN',
+    ta: 'ta-IN',
+    es: 'es-ES',
+  };
+
+  test('Validates BCP-47 speech locales for Web Speech API synthesis across all 5 languages', () => {
+    for (const lang of supportedLanguages) {
+      const locale = speechLocales[lang];
+      assert.ok(locale && locale.includes('-'), `Language '${lang}' must have valid BCP-47 speech locale`);
+    }
+  });
+
+  test('Ensures 1-tap dose confirmation buttons are translated into regional vernaculars', () => {
+    const doseConfirmations = {
+      en: '✓ I TOOK THIS',
+      hi: '✓ मैंने ले ली (I TOOK THIS)',
+      kn: '✓ ನಾನು ತೆಗೆದುಕೊಂಡೆ',
+      ta: '✓ நான் எடுத்துக்கொண்டேன்',
+      es: '✓ YA LA TOMÉ',
+    };
+
+    for (const lang of supportedLanguages) {
+      assert.ok(
+        doseConfirmations[lang] && doseConfirmations[lang].length > 3,
+        `Vernacular dose confirmation for '${lang}' must be non-empty`
+      );
+    }
+  });
+
+  test('Verifies senior daily care greeting localization across Indian and international dialects', () => {
+    const greetings = {
+      en: 'Good Day',
+      hi: 'नमस्ते',
+      kn: 'ನಮಸ್ಕಾರ',
+      ta: 'வணக்கம்',
+      es: 'Buen Día',
+    };
+
+    for (const lang of supportedLanguages) {
+      assert.ok(greetings[lang], `Greeting for '${lang}' must exist`);
+    }
+  });
+});

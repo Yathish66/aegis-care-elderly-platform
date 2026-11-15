@@ -12,9 +12,11 @@ import {
   ZoomIn, 
   Sun, 
   Sliders,
-  BellRing
+  BellRing,
+  Globe
 } from 'lucide-react';
 import { playAccessibleChime } from '@/lib/accessibility';
+import { SupportedLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n';
 
 interface AccessibilitySettingsModalProps {
   isOpen: boolean;
@@ -25,6 +27,8 @@ interface AccessibilitySettingsModalProps {
   onToggleHighContrast: () => void;
   speechSpeed: number;
   onSetSpeechSpeed: (speed: number) => void;
+  language?: SupportedLanguage;
+  onSelectLanguage?: (lang: SupportedLanguage) => void;
 }
 
 export function AccessibilitySettingsModal({
@@ -36,6 +40,8 @@ export function AccessibilitySettingsModal({
   onToggleHighContrast,
   speechSpeed,
   onSetSpeechSpeed,
+  language = 'en',
+  onSelectLanguage,
 }: AccessibilitySettingsModalProps) {
   if (!isOpen) return null;
 
@@ -104,7 +110,48 @@ export function AccessibilitySettingsModal({
             </div>
           </div>
 
-          {/* Section 2: High Contrast Vision Mode */}
+          {/* Section 2: Multilingual & Vernacular Regional Support */}
+          {onSelectLanguage && (
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Globe className="h-4 w-4 text-teal-600" />
+                  <span>2. Language & Vernacular Speech</span>
+                </span>
+                <span className="text-[10px] text-teal-600 font-bold">5 Regional Languages</span>
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {SUPPORTED_LANGUAGES.map((l) => {
+                  const isSelected = language === l.code;
+                  return (
+                    <button
+                      key={l.code}
+                      onClick={() => {
+                        onSelectLanguage(l.code);
+                        playAccessibleChime('success');
+                      }}
+                      className={`p-2.5 rounded-2xl border text-left font-bold transition-all flex items-center justify-between ${
+                        isSelected
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 ring-2 ring-teal-500/20'
+                          : 'border-slate-200 dark:border-slate-800 hover:border-teal-400'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{l.flag}</span>
+                        <div>
+                          <div className="text-xs font-black">{l.nativeName}</div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{l.label}</div>
+                        </div>
+                      </div>
+                      {isSelected && <Check className="w-4 h-4 text-teal-600" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Section 3: High Contrast Vision Mode */}
           <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-between">
             <div className="space-y-0.5">
               <span className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">

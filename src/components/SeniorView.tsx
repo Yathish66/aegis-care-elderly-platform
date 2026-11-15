@@ -23,6 +23,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { Medication, ElderlyProfile } from '@/types';
+import { SupportedLanguage, TRANSLATIONS, SUPPORTED_LANGUAGES } from '@/lib/i18n';
 import confetti from 'canvas-confetti';
 
 interface SeniorViewProps {
@@ -35,6 +36,7 @@ interface SeniorViewProps {
   onOpenVoiceAssistant?: () => void;
   onOpenPillIdentifier?: () => void;
   onOpenEmergencyModal?: () => void;
+  language?: SupportedLanguage;
 }
 
 export function SeniorView({
@@ -47,9 +49,13 @@ export function SeniorView({
   onOpenVoiceAssistant,
   onOpenPillIdentifier,
   onOpenEmergencyModal,
+  language = 'en',
 }: SeniorViewProps) {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'bedtime'>('all');
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const t = TRANSLATIONS[language].senior;
+  const activeLangOption = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   // Filtered medications
   const filteredMeds = selectedTimeFilter === 'all' 
@@ -94,15 +100,46 @@ export function SeniorView({
 
     window.speechSynthesis.cancel();
     const remainingMeds = medications.filter(m => m.status !== 'taken');
-    let speechText = `Namaste ${profile.preferredName}. Today you have taken ${takenCount} out of ${totalCount} medications. `;
-
-    if (remainingMeds.length > 0) {
-      speechText += `Your next upcoming medicine is ${remainingMeds[0].name}, dosage ${remainingMeds[0].dosage}, scheduled for ${remainingMeds[0].scheduledTime}. ${remainingMeds[0].instructions}.`;
+    let speechText = '';
+    if (language === 'hi') {
+      speechText = `नमस्ते ${profile.preferredName} जी। आज आपने ${totalCount} में से ${takenCount} दवाइयाँ ली हैं। `;
+      if (remainingMeds.length > 0) {
+        speechText += `आपकी अगली दवा ${remainingMeds[0].name} है, समय ${remainingMeds[0].scheduledTime}। ${remainingMeds[0].instructions}।`;
+      } else {
+        speechText += 'बहुत बढ़िया! आज की आपकी सभी दवाइयाँ पूरी हो चुकी हैं।';
+      }
+    } else if (language === 'kn') {
+      speechText = `ನಮಸ್ಕಾರ ${profile.preferredName} ಅವರೇ. ಇಂದು ನೀವು ${totalCount} ರಲ್ಲಿ ${takenCount} ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಂಡಿದ್ದೀರಿ. `;
+      if (remainingMeds.length > 0) {
+        speechText += `ನಿಮ್ಮ ಮುಂದಿನ ಔಷಧಿ ${remainingMeds[0].name}, ಸಮಯ ${remainingMeds[0].scheduledTime}. ${remainingMeds[0].instructions}.`;
+      } else {
+        speechText += 'ಅದ್ಭುತ! ಇಂದಿನ ಎಲ್ಲಾ ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ.';
+      }
+    } else if (language === 'ta') {
+      speechText = `வணக்கம் ${profile.preferredName}. இன்று நீங்கள் ${totalCount} மருந்துகளில் ${takenCount} மருந்துகளை எடுத்துக்கொண்டுள்ளீர்கள். `;
+      if (remainingMeds.length > 0) {
+        speechText += `உங்களின் அடுத்த மருந்து ${remainingMeds[0].name}, நேரம் ${remainingMeds[0].scheduledTime}. ${remainingMeds[0].instructions}.`;
+      } else {
+        speechText += 'அற்புதம்! இன்றைய அனைத்து மருந்துகளையும் எடுத்துக்கொண்டீர்கள்.';
+      }
+    } else if (language === 'es') {
+      speechText = `Buen día ${profile.preferredName}. Hoy ha tomado ${takenCount} de ${totalCount} medicamentos. `;
+      if (remainingMeds.length > 0) {
+        speechText += `Su próximo medicamento es ${remainingMeds[0].name}, programado para las ${remainingMeds[0].scheduledTime}. ${remainingMeds[0].instructions}.`;
+      } else {
+        speechText += '¡Excelente trabajo! Ha completado todos sus medicamentos de hoy.';
+      }
     } else {
-      speechText += 'Wonderful job! You have taken all your scheduled medications for today.';
+      speechText = `Good day ${profile.preferredName}. Today you have taken ${takenCount} out of ${totalCount} medications. `;
+      if (remainingMeds.length > 0) {
+        speechText += `Your next upcoming medicine is ${remainingMeds[0].name}, dosage ${remainingMeds[0].dosage}, scheduled for ${remainingMeds[0].scheduledTime}. ${remainingMeds[0].instructions}.`;
+      } else {
+        speechText += 'Wonderful job! You have taken all your scheduled medications for today.';
+      }
     }
 
     const utterance = new SpeechSynthesisUtterance(speechText);
+    utterance.lang = activeLangOption.speechLocale;
     utterance.rate = 0.9;
     utterance.pitch = 1.0;
     utterance.onstart = () => setIsSpeaking(true);
@@ -130,13 +167,13 @@ export function SeniorView({
           
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide">
-              <span>🌸 Dadi's Daily Care Assistant</span>
+              <span>🌸 {profile.preferredName}'s {t.dailyCareAssistant}</span>
             </div>
             <h1 className={`${fontStyles.heading} font-black tracking-tight`}>
-              Good Day, {profile.preferredName}!
+              {t.greeting}, {profile.preferredName}!
             </h1>
             <p className={`${fontStyles.subheading} text-teal-100 font-medium`}>
-              Here are your medicines for today. Stay healthy and smiling.
+              {t.heroSubtitle}
             </p>
           </div>
 
@@ -152,12 +189,12 @@ export function SeniorView({
             >
               <Volume2 className="w-6 h-6 text-teal-600" />
               <span className="text-base font-extrabold">
-                {isSpeaking ? 'Reading Aloud...' : 'Read Aloud My Medicines'}
+                {isSpeaking ? t.readingAloud : t.readAloud}
               </span>
             </button>
 
             <div className="bg-black/20 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-3 text-center">
-              <div className="text-xs uppercase tracking-wider text-teal-200 font-semibold">Today's Progress</div>
+              <div className="text-xs uppercase tracking-wider text-teal-200 font-semibold">{t.todaysProgress}</div>
               <div className="text-2xl font-black">{takenCount} / {totalCount} Taken ({adherencePercent}%)</div>
             </div>
           </div>
@@ -177,13 +214,13 @@ export function SeniorView({
           </div>
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-              Speak to Aegis
+              {t.voiceCompanionTitle}
             </span>
             <h3 className="text-lg font-black text-slate-900 dark:text-white">
               Voice Companion
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Ask &ldquo;Did I take my pill?&rdquo; or any question
+              {t.voiceCompanionDesc}
             </p>
           </div>
         </button>
@@ -198,13 +235,13 @@ export function SeniorView({
           </div>
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
-              Gemini Vision
+              {t.pillIdTitle}
             </span>
             <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Identify Loose Pill
+              Gemini Vision
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Check unknown tablets before swallowing
+              {t.pillIdDesc}
             </p>
           </div>
         </button>
@@ -219,13 +256,13 @@ export function SeniorView({
           </div>
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
-              Paramedic Ready
+              {t.emergencyIdTitle}
             </span>
             <h3 className="text-lg font-black text-slate-900 dark:text-white">
-              Emergency Medical ID
+              Medical ID
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Allergies, GPS location & 1-tap SOS
+              {t.emergencyIdDesc}
             </p>
           </div>
         </button>
@@ -241,7 +278,7 @@ export function SeniorView({
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          All Medicines ({totalCount})
+          {t.allMeds} ({totalCount})
         </button>
 
         <button
@@ -253,7 +290,7 @@ export function SeniorView({
           }`}
         >
           <Sun className="w-4 h-4 text-amber-400" />
-          <span>Morning (8-9 AM)</span>
+          <span>{t.morning}</span>
         </button>
 
         <button
@@ -265,7 +302,7 @@ export function SeniorView({
           }`}
         >
           <CloudSun className="w-4 h-4 text-orange-300" />
-          <span>Afternoon (1 PM)</span>
+          <span>{t.afternoon}</span>
         </button>
 
         <button
@@ -277,7 +314,7 @@ export function SeniorView({
           }`}
         >
           <Moon className="w-4 h-4 text-indigo-300" />
-          <span>Evening</span>
+          <span>{t.evening}</span>
         </button>
 
         <button
@@ -289,7 +326,7 @@ export function SeniorView({
           }`}
         >
           <Moon className="w-4 h-4 text-purple-300" />
-          <span>Bedtime (9:30 PM)</span>
+          <span>{t.bedtime}</span>
         </button>
       </div>
 
@@ -347,13 +384,13 @@ export function SeniorView({
                     </p>
 
                     <div className="text-xs sm:text-sm font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 px-3 py-1.5 rounded-xl inline-block">
-                      🎯 Purpose: {med.purpose}
+                      🎯 {t.purpose}: {med.purpose}
                     </div>
 
                     {med.foodWarning && (
                       <div className="text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
                         <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                        <span>Food Advisory: {med.foodWarning}</span>
+                        <span>{t.foodAdvisory}: {med.foodWarning}</span>
                       </div>
                     )}
                   </div>
@@ -368,7 +405,7 @@ export function SeniorView({
                         className={`w-full ${fontStyles.btn} rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 active:scale-95 transition-all`}
                       >
                         <CheckCircle2 className="w-7 h-7" />
-                        <span>I TOOK THIS</span>
+                        <span>{t.takeMedicine}</span>
                       </button>
 
                       <button
@@ -376,17 +413,17 @@ export function SeniorView({
                         className="w-full py-3.5 px-6 rounded-2xl bg-muted hover:bg-muted/80 text-foreground font-bold text-sm sm:text-base border border-border flex items-center justify-center gap-2 transition-all"
                       >
                         <Clock className="w-4 h-4 text-amber-500" />
-                        <span>Remind in 15 mins</span>
+                        <span>{t.remind15m}</span>
                       </button>
                     </>
                   ) : (
                     <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
                       <div className="text-emerald-600 dark:text-emerald-400 font-black text-lg flex items-center justify-center gap-1.5">
                         <CheckCircle2 className="w-6 h-6" />
-                        <span>Dose Completed</span>
+                        <span>{t.takenAt}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Notified daughter Priya on portal
+                      <p className="text-xs text-muted-foreground font-medium">
+                        {med.lastTakenAt || 'Today'}
                       </p>
                     </div>
                   )}

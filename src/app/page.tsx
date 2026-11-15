@@ -22,6 +22,7 @@ import { SecurityArchitectureModal } from '@/components/SecurityArchitectureModa
 import { AccessibilitySettingsModal } from '@/components/AccessibilitySettingsModal';
 import { PatientProfileModal } from '@/components/PatientProfileModal';
 import { playAccessibleChime } from '@/lib/accessibility';
+import { SupportedLanguage } from '@/lib/i18n';
 import { 
   INITIAL_PROFILE, 
   INITIAL_MEDICATIONS, 
@@ -76,8 +77,9 @@ export default function Home() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [speechSpeed, setSpeechSpeed] = useState(0.9);
+  const [language, setLanguage] = useState<SupportedLanguage>('en');
 
-  // Restore persisted profile and medications on client mount
+  // Restore persisted profile, medications and language on client mount
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -94,6 +96,10 @@ export default function Home() {
           if (Array.isArray(parsed) && parsed.length > 0) {
             setMedications(parsed);
           }
+        }
+        const savedLang = localStorage.getItem('aegis_language');
+        if (savedLang && ['en', 'hi', 'kn', 'ta', 'es'].includes(savedLang)) {
+          setLanguage(savedLang as SupportedLanguage);
         }
       } catch (err) {
         console.error('LocalStorage restoration error:', err);
@@ -208,6 +214,33 @@ export default function Home() {
       'Patient profile restored to default demo baseline (Dadi Kamala).'
     );
     showToast('✓ Profile reset to default demo standard.');
+  };
+
+  const handleSelectLanguage = (lang: SupportedLanguage) => {
+    setLanguage(lang);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('aegis_language', lang);
+      } catch (err) {
+        console.error('LocalStorage language save error:', err);
+      }
+    }
+    playAccessibleChime('success');
+    const langNames: Record<SupportedLanguage, string> = {
+      en: 'English',
+      hi: 'हिन्दी (Hindi)',
+      kn: 'ಕನ್ನಡ (Kannada)',
+      ta: 'தமிழ் (Tamil)',
+      es: 'Español (Spanish)',
+    };
+    showToast(`🌐 Language set to ${langNames[lang]}`);
+    addAuditLog(
+      'System UI',
+      'SYSTEM',
+      `Language switched to ${langNames[lang]}`,
+      'SECURITY',
+      `Platform locale updated to ${lang}.`
+    );
   };
 
   // Dose Actions
@@ -547,6 +580,8 @@ export default function Home() {
         onOpenSecurityArchitecture={() => setIsSecurityModalOpen(true)}
         onOpenAccessibility={() => setIsA11yModalOpen(true)}
         onOpenProfileSetup={() => setIsProfileModalOpen(true)}
+        language={language}
+        onSelectLanguage={handleSelectLanguage}
       />
 
       {/* Main Content Area (WCAG 2.1 AAA Landmark & Skip Target) */}
@@ -569,6 +604,7 @@ export default function Home() {
             onOpenVoiceAssistant={() => setIsVoiceAssistantOpen(true)}
             onOpenPillIdentifier={() => setIsPillIdentifierOpen(true)}
             onOpenEmergencyModal={() => setIsEmergencyModalOpen(true)}
+            language={language}
           />
         ) : (
           <FamilyPortal
@@ -592,6 +628,7 @@ export default function Home() {
             onRunGeminiSafetyCheck={handleRunGeminiSafetyCheck}
             isAnalyzingSafety={isAnalyzingSafety}
             onOpenProfileSetup={() => setIsProfileModalOpen(true)}
+            language={language}
           />
         )}
 
@@ -707,6 +744,8 @@ export default function Home() {
         onToggleHighContrast={() => setIsHighContrast((prev) => !prev)}
         speechSpeed={speechSpeed}
         onSetSpeechSpeed={setSpeechSpeed}
+        language={language}
+        onSelectLanguage={handleSelectLanguage}
       />
 
       <PatientProfileModal
