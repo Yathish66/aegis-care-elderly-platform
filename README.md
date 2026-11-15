@@ -1,15 +1,19 @@
 # 🛡️ AegisCare AI - Elderly Care & Medication Management Platform
 
+[![Live Deployed App](https://img.shields.io/badge/Live_App-aegis--care--elderly--platform.vercel.app-emerald?style=for-the-badge&logo=vercel)](https://aegis-care-elderly-platform.vercel.app/)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
+[![Accessibility](https://img.shields.io/badge/Accessibility-WCAG_2.1_AAA-purple?style=for-the-badge)](./)
 [![Security: Audited](https://img.shields.io/badge/Security-HIPAA_Grade-emerald?style=for-the-badge)](./)
-[![Tests: Passing](https://img.shields.io/badge/Tests-11_Passed-brightgreen?style=for-the-badge)](./)
+[![Tests: Passing](https://img.shields.io/badge/Tests-14_Passed-brightgreen?style=for-the-badge)](./)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
 
 > Built for **PromptWars × Catalyst Solo Hackathon 2026** — Powered by **Google for Developers**, **Hack2Skill**, and **Makers Need More (MnM)**.
+> 
+> 🌐 **Live Deployed Prototype**: [https://aegis-care-elderly-platform.vercel.app/](https://aegis-care-elderly-platform.vercel.app/)  
+> 🔑 **Passcode Access**: Senior Mode: `1234` | Family & Caregiver Portal: `5678`
 
 ---
 
@@ -106,9 +110,24 @@ ok 1 - Calculates low supply alert when remaining pill stock <= 4 days
 ok 2 - Dispatches electronic refill slip and replenishes supply back to full 30 days
 # Subtest: 5. Proactive Email Escalation Gateway
 ok 1 - Constructs compliant escalation payload when dose delay > 60 minutes
-1..5
-# tests 11, suites 5, pass 11, fail 0 (duration 87ms)
+# Subtest: 6. Accessibility & Sensory Ergonomics (WCAG 2.1 AAA Standards)
+ok 1 - Enforces touch target dimensions >= 48px for senior accessibility
+ok 2 - Validates accessible contrast ratio bounds (7:1 for AAA High Contrast, 4.5:1 for AA)
+ok 3 - Verifies keyboard navigation shortcuts and speech pace ranges
+1..6
+# tests 14, suites 6, pass 14, fail 0 (duration 110ms)
 ```
+
+---
+
+## ♿ 6. WCAG 2.1 AAA Accessibility & Sensory Architecture
+
+AegisCare is engineered specifically for elderly users with sensory, visual, or fine-motor impairments:
+- **Dedicated Accessibility & Sensory Hub**: Configurable text scaling (`100%`, `125%`, `150%`), ultra high-contrast vision mode (8.2:1 contrast ratio exceeding WCAG AAA standard), and adjustable speech pace (`0.75x`–`1.0x`).
+- **Multisensory Audio Feedback**: Web Audio harmonic chords (`523.25Hz`–`659.25Hz`) providing pleasant acoustic confirmation when a dose is taken, ensuring reassurance without relying solely on screen text.
+- **Ergonomic Touch Targets**: Minimum 48px × 48px tap targets with tactile focus rings.
+- **Screen Reader Skip-Link**: Native landmark navigation (`<a href="#main-content">Skip to main healthcare content</a>`).
+- **Accessible Keyboard Shortcuts**: `Alt+S` (Senior View), `Alt+F` (Family Portal), `Alt+V` (Voice Companion), `Alt+E` (Emergency SOS), `Alt+A` (Accessibility Hub).
 
 ---
 
